@@ -1,0 +1,231 @@
+title: IPS Manager
+name: ips-manager
+server_name: localhost:8000
+version: 1.0
+salt: uet-ips-man
+connection_string: mysql+pymysql://root:newpass123@172.17.0.1/ipsman
+namespaces:
+  - ns_name: roles
+    ns_description: roles namespace
+    resource_name: role
+    props:
+      - name: idRole
+        type: Integer
+        primary_key: yes
+      - name: name
+        type: String
+        type_specs: (50)
+      - name: description
+        type: String
+        type_specs: (255)
+    list_api: list roles
+    list_api_description: list roles
+    new_api: new role
+    new_api_description: new role
+    get_api: get role
+    get_api_description: get role
+    update_api: update role
+    update_api_description: update role
+    delete_api: delete role
+    delete_api_description: delete role
+    find_api: find role
+    find_api_description: find role
+  - ns_name: users
+    ns_description: users namespace
+    resource_name: user
+    props:
+      - name: idUser
+        type: Integer
+        primary_key: yes
+      - name: username
+        type: String
+        type_specs: (50)
+      - name: password
+        type: String
+        type_specs: (100)
+    list_api: list users
+    list_api_description: list users
+    new_api: new user
+    new_api_description: new user
+    get_api: get user
+    get_api_description: get user
+    update_api: update user
+    update_api_description: update user
+    delete_api: delete user
+    delete_api_description: delete user
+    find_api: find user
+    find_api_description: find user
+  - ns_name: userRoleRels
+    ns_description: User-Role relationship (many - many)
+    resource_name: userRoleRel
+    props:
+      - name: idUserRoleRel
+        type: Integer
+        primary_key: yes
+      - name: idRole
+        type: Integer
+        foreign_key: role.idRole
+      - name: idUser
+        type: Integer
+        foreign_key: user.idUser
+    list_api: list user-role relationships
+    list_api_description: list user-role relationships
+    new_api: assign role to a user
+    new_api_description: assign a role to a user
+    get_api: get a user-role rels
+    get_api_description: get user
+    update_api: update
+    update_api_description: update 
+    delete_api: delete 
+    delete_api_description: delete 
+    find_api: find user-role relationships
+    find_api_description: find user-role relationships
+  - ns_name: nodetypes
+    ns_description: node types (hostIPS, netIPS)
+    resource_name: nodetype
+    props:
+      - name: idNodetype
+        type: Integer
+        primary_key: yes
+      - name: name
+        type: String
+        type_specs: (50)
+      - name: description
+        type: String
+        type_specs: (255)
+    list_api: list nodetypes
+    list_api_description: list nodetypes
+    new_api: new nodetype
+    new_api_description: new nodetype
+    get_api: get nodetype
+    get_api_description: get nodetype
+    delete_api: delete nodetype
+    delete_api_description: delete nodetype
+    update_api: update nodetype
+    update_api_description: update nodetype
+    find_api: find nodetypes
+    find_api_description: find nodetypes
+  - ns_name: nodes
+    ns_description: nodes namespace
+    resource_name: node
+    props:
+      - name: idNode
+        type: Integer
+        primary_key: yes
+      - name: idNodetype
+        type: Integer
+        foreign_key: nodetype.idNodetype
+      - name: specs
+        type: Text
+    list_api: list nodes
+    list_api_description: list nodes
+    new_api: new node
+    new_api_description: new node
+    delete_api: delete node
+    delete_api_description: delete node
+    get_api: get node
+    get_api_description: get node
+    update_api: update node
+    update_api_description: update node
+    find_api: find nodes
+    find_api_description: find nodes
+  - ns_name: objects
+    ns_description: objects can be nodes or groups
+    resource_name: object
+    props:
+      - name: idObject
+        type: Integer
+        primary_key: yes
+      - name: name
+        type: String
+        type_specs: (50)
+      - name: idNode
+        type: Integer
+        foreign_key: node.idNode
+      - name: description
+        type: String
+        type_specs: (255)
+    list_api: list objects
+    list_api_description: list objects
+    new_api: new object
+    new_api_description: new object
+    delete_api: delete object
+    delete_api_description: delete object
+    get_api: get object
+    get_api_description: get object
+    update_api: update object
+    update_api_description: update object
+    find_api: find objects
+    find_api_description: find objects
+  - ns_name: containmentRels
+    ns_description: containment relationships. This will implement grouping capability
+    resource_name: containmentRel
+    props:
+      - name: idContainmentRel
+        type: Integer
+        primary_key: yes
+      - name: idContainer
+        type: Integer
+        foreign_key: object.idObject
+      - name: idContainee
+        type: Integer
+        foreign_key: object.idObject
+    list_api: list containment relationships
+    list_api_description: list containment relationships
+    new_api: new containment relationship
+    new_api_description: new containment relationship
+    delete_api: delete containment relationship
+    delete_api_description: delete containment relationship
+    get_api: get a containment relationship
+    get_api_description: get a containment relationship
+    update_api: update a containment relationship
+    update_api_description: update a containment relationship
+    find_api: find containment relationships
+    find_api_description: find containment relationships
+  - ns_name: permissions
+    ns_description: permission table namespace
+    resource_name: permission
+    props:
+      - name: idPermission
+        type: Integer
+        primary_key: yes
+      - name: idRole
+        type: Integer
+        foreign_key: role.idRole
+      - name: idObject
+        type: Integer
+        foreign_key: object.idObject
+    list_api: list permissions
+    list_api_description: list permissions
+    new_api: new permission
+    new_api_description: new permission
+    get_api: get permission
+    get_api_description: get permission
+    update_api: update permission
+    update_api_description: update permission
+    delete_api: delete permission
+    delete_api_description: delete permission
+    find_api: find permissions
+    find_api_description: find permissions
+  - ns_name: login
+    ns_description: login apis
+    resource_name: login
+    nodb: yes
+    props:
+      - name: username
+        type: String
+      - name: password
+        type: String
+    list_api: check login
+    list_api_description: check login
+    new_api: do login
+    new_api_description: do login
+  - ns_name: logout
+    ns_description: logout api
+    resource_name: logout
+    nodb: yes
+    props:
+      - name: username
+        type: String
+    list_api: do logout
+    list_api_description: do logout
