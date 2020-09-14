@@ -80,11 +80,11 @@ namespaces:
     delete_api_description: delete 
     find_api: find user-role relationships
     find_api_description: find user-role relationships
-  - ns_name: nodetypes
-    ns_description: node types (hostIPS, netIPS)
-    resource_name: nodetype
+  - ns_name: enginetypes
+    ns_description: engine types (hostIPS, netIPS)
+    resource_name: enginetype
     props:
-      - name: idNodetype
+      - name: idEnginetype
         type: Integer
         primary_key: yes
       - name: name
@@ -93,44 +93,44 @@ namespaces:
       - name: description
         type: String
         type_specs: (255)
-    list_api: list nodetypes
-    list_api_description: list nodetypes
-    new_api: new nodetype
-    new_api_description: new nodetype
-    get_api: get nodetype
-    get_api_description: get nodetype
-    delete_api: delete nodetype
-    delete_api_description: delete nodetype
-    update_api: update nodetype
-    update_api_description: update nodetype
-    find_api: find nodetypes
-    find_api_description: find nodetypes
-  - ns_name: nodes
-    ns_description: nodes namespace
-    resource_name: node
+    list_api: list enginetypes
+    list_api_description: list enginetypes
+    new_api: new enginetype
+    new_api_description: new enginetype
+    get_api: get enginetype
+    get_api_description: get enginetype
+    delete_api: delete enginetype
+    delete_api_description: delete enginetype
+    update_api: update enginetype
+    update_api_description: update enginetype
+    find_api: find enginetypes
+    find_api_description: find enginetypes
+  - ns_name: engines
+    ns_description: engines namespace
+    resource_name: engine
     props:
-      - name: idNode
+      - name: idEngine
         type: Integer
         primary_key: yes
-      - name: idNodetype
+      - name: idEnginetype
         type: Integer
-        foreign_key: nodetype.idNodetype
+        foreign_key: enginetype.idEnginetype
       - name: specs
         type: Text
-    list_api: list nodes
-    list_api_description: list nodes
-    new_api: new node
-    new_api_description: new node
-    delete_api: delete node
-    delete_api_description: delete node
-    get_api: get node
-    get_api_description: get node
-    update_api: update node
-    update_api_description: update node
-    find_api: find nodes
-    find_api_description: find nodes
+    list_api: list engines
+    list_api_description: list engines
+    new_api: new engine
+    new_api_description: new engine
+    delete_api: delete engine
+    delete_api_description: delete engine
+    get_api: get engine
+    get_api_description: get engine
+    update_api: update engine
+    update_api_description: update engine
+    find_api: find engines
+    find_api_description: find engines
   - ns_name: objects
-    ns_description: objects can be nodes or groups
+    ns_description: objects can be engines or groups
     resource_name: object
     props:
       - name: idObject
@@ -139,9 +139,9 @@ namespaces:
       - name: name
         type: String
         type_specs: (50)
-      - name: idNode
+      - name: idEngine
         type: Integer
-        foreign_key: node.idNode
+        foreign_key: engine.idEngine
       - name: description
         type: String
         type_specs: (255)
