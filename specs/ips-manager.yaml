@@ -68,6 +68,10 @@ namespaces:
       - name: idUser
         type: Integer
         foreign_key: user.idUser
+    uniques:
+      - keys:
+        - name: idRole
+        - name: idUser
     list_api: list user-role relationships
     list_api_description: list user-role relationships
     new_api: assign role to a user
@@ -170,6 +174,10 @@ namespaces:
       - name: idContainee
         type: Integer
         foreign_key: object.idObject
+    uniques:
+      - keys:
+        - name: idContainer
+        - name: idContainee
     list_api: list containment relationships
     list_api_description: list containment relationships
     new_api: new containment relationship
@@ -195,6 +203,10 @@ namespaces:
       - name: idObject
         type: Integer
         foreign_key: object.idObject
+    uniques:
+      - keys:
+        - name: idRole
+        - name: idObject
     list_api: list permissions
     list_api_description: list permissions
     new_api: new permission

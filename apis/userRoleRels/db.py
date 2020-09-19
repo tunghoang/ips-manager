@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -16,6 +17,11 @@ class Userrolerel(__db.Base):
   idRole = Column(Integer, ForeignKey('role.idRole'))
   idUser = Column(Integer, ForeignKey('user.idUser'))
 
+  constraints = list()
+  constraints.append(UniqueConstraint('idRole','idUser'))
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idUserRoleRel" in dictModel) and (dictModel["idUserRoleRel"] != None):
       self.idUserRoleRel = dictModel["idUserRoleRel"]
