@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -16,6 +17,11 @@ class Containmentrel(__db.Base):
   idContainer = Column(Integer, ForeignKey('object.idObject'))
   idContainee = Column(Integer, ForeignKey('object.idObject'))
 
+  constraints = list()
+  constraints.append(UniqueConstraint('idContainer','idContainee'))
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idContainmentRel" in dictModel) and (dictModel["idContainmentRel"] != None):
       self.idContainmentRel = dictModel["idContainmentRel"]

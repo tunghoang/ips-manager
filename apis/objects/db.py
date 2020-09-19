@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -17,6 +18,10 @@ class Object(__db.Base):
   idEngine = Column(Integer, ForeignKey('engine.idEngine'))
   description = Column(String(255))
 
+  constraints = list()
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idObject" in dictModel) and (dictModel["idObject"] != None):
       self.idObject = dictModel["idObject"]
