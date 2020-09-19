@@ -15,7 +15,7 @@ class DbInstance:
   @staticmethod
   def getInstance():
     if DbInstance.__instance is None:
-      connStr = 'mysql+pymysql://root:newpass123@172.17.0.1/ipsman'
+      connStr = 'mysql+pymysql://admin:abc123@localhost/ipsman'
       print('connect to db: ', connStr)
       DbInstance.__instance = DbInstance(connStr)
     return DbInstance.__instance
