@@ -52,6 +52,7 @@ def __doList():
   return __db.session().query(User).all()
   
 def __doNew(instance):
+  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -65,19 +66,19 @@ def __doUpdate(id, model):
   instance = getUser(id)
   if instance == None:
     return {}
+  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getUser(id)
+  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
   results = __db.session().query(User).filter_by(**model).all()
   return results
-
-
 
 
 def listUsers():
@@ -88,6 +89,9 @@ def listUsers():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newUser(model):
   doLog("new DAO function. model: {}".format(model))
@@ -99,6 +103,9 @@ def newUser(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getUser(id):
   doLog("get DAO function", id)
@@ -108,6 +115,9 @@ def getUser(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateUser(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -117,6 +127,9 @@ def updateUser(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteUser(id):
   doLog("delete DAO function", id)
@@ -126,6 +139,9 @@ def deleteUser(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findUser(model):
   doLog("find DAO function %s" % model)
@@ -135,3 +151,6 @@ def findUser(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e

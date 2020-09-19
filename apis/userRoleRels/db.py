@@ -53,6 +53,7 @@ def __doList():
   return __db.session().query(Userrolerel).all()
   
 def __doNew(instance):
+  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -66,19 +67,19 @@ def __doUpdate(id, model):
   instance = getUserrolerel(id)
   if instance == None:
     return {}
+  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getUserrolerel(id)
+  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
   results = __db.session().query(Userrolerel).filter_by(**model).all()
   return results
-
-
 
 
 def listUserrolerels():
@@ -89,6 +90,9 @@ def listUserrolerels():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newUserrolerel(model):
   doLog("new DAO function. model: {}".format(model))
@@ -100,6 +104,9 @@ def newUserrolerel(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getUserrolerel(id):
   doLog("get DAO function", id)
@@ -109,6 +116,9 @@ def getUserrolerel(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateUserrolerel(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -118,6 +128,9 @@ def updateUserrolerel(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteUserrolerel(id):
   doLog("delete DAO function", id)
@@ -127,6 +140,9 @@ def deleteUserrolerel(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findUserrolerel(model):
   doLog("find DAO function %s" % model)
@@ -136,3 +152,6 @@ def findUserrolerel(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
