@@ -86,6 +86,7 @@ def listUsers():
 
 def newUser(model):
   doLog("new DAO function. model: {}".format(model))
+  model['password'] = doHash(model['password'])
   instance = User(model)
   res = False
   try:
