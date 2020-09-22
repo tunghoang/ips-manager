@@ -123,6 +123,8 @@ def getUser(id):
 def updateUser(id, model):
   doLog("update DAO function. Model: {}".format(model))
   try:
+    if 'password' in model:
+      model['password'] = doHash(model['password'])
     return __doUpdate(id, model)
   except OperationalError as e:
     doLog(e)
