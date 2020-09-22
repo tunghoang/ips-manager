@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -16,6 +17,10 @@ class Role(__db.Base):
   name = Column(String(50))
   description = Column(String(255))
 
+  constraints = list()
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idRole" in dictModel) and (dictModel["idRole"] != None):
       self.idRole = dictModel["idRole"]
@@ -47,6 +52,7 @@ def __doList():
   return __db.session().query(Role).all()
   
 def __doNew(instance):
+  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -60,19 +66,19 @@ def __doUpdate(id, model):
   instance = getRole(id)
   if instance == None:
     return {}
+  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getRole(id)
+  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
   results = __db.session().query(Role).filter_by(**model).all()
   return results
-
-
 
 
 def listRoles():
@@ -83,6 +89,9 @@ def listRoles():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newRole(model):
   doLog("new DAO function. model: {}".format(model))
@@ -94,6 +103,9 @@ def newRole(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getRole(id):
   doLog("get DAO function", id)
@@ -103,6 +115,9 @@ def getRole(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateRole(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -112,6 +127,9 @@ def updateRole(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteRole(id):
   doLog("delete DAO function", id)
@@ -121,6 +139,9 @@ def deleteRole(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findRole(model):
   doLog("find DAO function %s" % model)
@@ -130,3 +151,6 @@ def findRole(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e

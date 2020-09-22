@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -17,6 +18,10 @@ class Object(__db.Base):
   idEngine = Column(Integer, ForeignKey('engine.idEngine'))
   description = Column(String(255))
 
+  constraints = list()
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idObject" in dictModel) and (dictModel["idObject"] != None):
       self.idObject = dictModel["idObject"]
@@ -52,6 +57,7 @@ def __doList():
   return __db.session().query(Object).all()
   
 def __doNew(instance):
+  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -65,19 +71,19 @@ def __doUpdate(id, model):
   instance = getObject(id)
   if instance == None:
     return {}
+  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getObject(id)
+  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
   results = __db.session().query(Object).filter_by(**model).all()
   return results
-
-
 
 
 def listObjects():
@@ -88,6 +94,9 @@ def listObjects():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newObject(model):
   doLog("new DAO function. model: {}".format(model))
@@ -99,6 +108,9 @@ def newObject(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getObject(id):
   doLog("get DAO function", id)
@@ -108,6 +120,9 @@ def getObject(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateObject(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -117,6 +132,9 @@ def updateObject(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteObject(id):
   doLog("delete DAO function", id)
@@ -126,6 +144,9 @@ def deleteObject(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findObject(model):
   doLog("find DAO function %s" % model)
@@ -135,3 +156,6 @@ def findObject(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e

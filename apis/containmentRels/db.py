@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -16,6 +17,11 @@ class Containmentrel(__db.Base):
   idContainer = Column(Integer, ForeignKey('object.idObject'))
   idContainee = Column(Integer, ForeignKey('object.idObject'))
 
+  constraints = list()
+  constraints.append(UniqueConstraint('idContainer','idContainee'))
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idContainmentRel" in dictModel) and (dictModel["idContainmentRel"] != None):
       self.idContainmentRel = dictModel["idContainmentRel"]
@@ -47,6 +53,7 @@ def __doList():
   return __db.session().query(Containmentrel).all()
   
 def __doNew(instance):
+  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -60,19 +67,19 @@ def __doUpdate(id, model):
   instance = getContainmentrel(id)
   if instance == None:
     return {}
+  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getContainmentrel(id)
+  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
   results = __db.session().query(Containmentrel).filter_by(**model).all()
   return results
-
-
 
 
 def listContainmentrels():
@@ -83,6 +90,9 @@ def listContainmentrels():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newContainmentrel(model):
   doLog("new DAO function. model: {}".format(model))
@@ -94,6 +104,9 @@ def newContainmentrel(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getContainmentrel(id):
   doLog("get DAO function", id)
@@ -103,6 +116,9 @@ def getContainmentrel(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateContainmentrel(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -112,6 +128,9 @@ def updateContainmentrel(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteContainmentrel(id):
   doLog("delete DAO function", id)
@@ -121,6 +140,9 @@ def deleteContainmentrel(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findContainmentrel(model):
   doLog("find DAO function %s" % model)
@@ -130,3 +152,6 @@ def findContainmentrel(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e

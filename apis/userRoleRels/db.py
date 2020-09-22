@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -19,6 +20,11 @@ class Userrolerel(__db.Base):
   idRole = Column(Integer, ForeignKey('role.idRole'))
   idUser = Column(Integer, ForeignKey('user.idUser'))
 
+  constraints = list()
+  constraints.append(UniqueConstraint('idRole','idUser'))
+  if len(constraints) > 0:
+    __table_args__ = tuple(constraints)
+ 
   def __init__(self, dictModel):
     if ("idUserRoleRel" in dictModel) and (dictModel["idUserRoleRel"] != None):
       self.idUserRoleRel = dictModel["idUserRoleRel"]
@@ -50,6 +56,7 @@ def __doList():
   return __db.session().query(Userrolerel).all()
   
 def __doNew(instance):
+  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -63,11 +70,13 @@ def __doUpdate(id, model):
   instance = getUserrolerel(id)
   if instance == None:
     return {}
+  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getUserrolerel(id)
+  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
@@ -87,6 +96,9 @@ def listUserrolerels():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newUserrolerel(model):
   doLog("new DAO function. model: {}".format(model))
@@ -98,6 +110,9 @@ def newUserrolerel(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getUserrolerel(id):
   doLog("get DAO function", id)
@@ -107,6 +122,9 @@ def getUserrolerel(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateUserrolerel(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -116,6 +134,9 @@ def updateUserrolerel(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteUserrolerel(id):
   doLog("delete DAO function", id)
@@ -125,6 +146,9 @@ def deleteUserrolerel(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findUserrolerel(model):
   doLog("find DAO function %s" % model)
@@ -134,3 +158,6 @@ def findUserrolerel(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e

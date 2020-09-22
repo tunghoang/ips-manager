@@ -1,0 +1,2 @@
+[Default]
+connection_string = mysql+pymysql://root:newpass123@172.17.0.1/ipsman

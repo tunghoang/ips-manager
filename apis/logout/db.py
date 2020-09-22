@@ -1,4 +1,5 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
@@ -47,8 +48,6 @@ def __doFind(model):
   return []
 
 
-
-
 def listLogouts():
   doLog("list DAO function")
   try:
@@ -57,6 +56,9 @@ def listLogouts():
     doLog(e)
     __recover()
     return __doList()
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def newLogout(model):
   doLog("new DAO function. model: {}".format(model))
@@ -68,6 +70,9 @@ def newLogout(model):
     doLog(e)
     __recover()
     return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getLogout(id):
   doLog("get DAO function", id)
@@ -77,6 +82,9 @@ def getLogout(id):
     doLog(e)
     __recover()
     return __doGet(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def updateLogout(id, model):
   doLog("update DAO function. Model: {}".format(model))
@@ -86,6 +94,9 @@ def updateLogout(id, model):
     doLog(e)
     __recover()
     return __doUpdate(id, model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def deleteLogout(id):
   doLog("delete DAO function", id)
@@ -95,6 +106,9 @@ def deleteLogout(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def findLogout(model):
   doLog("find DAO function %s" % model)
@@ -104,3 +118,6 @@ def findLogout(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
