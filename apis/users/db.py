@@ -95,6 +95,7 @@ def listUsers():
 
 def newUser(model):
   doLog("new DAO function. model: {}".format(model))
+  model['password'] = doHash(model['password'])
   instance = User(model)
   res = False
   try:
@@ -122,6 +123,8 @@ def getUser(id):
 def updateUser(id, model):
   doLog("update DAO function. Model: {}".format(model))
   try:
+    if 'password' in model:
+      model['password'] = doHash(model['password'])
     return __doUpdate(id, model)
   except OperationalError as e:
     doLog(e)

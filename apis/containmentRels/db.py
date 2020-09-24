@@ -6,6 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..objects.db import Object
 
 __db = DbInstance.getInstance()
 
@@ -77,8 +78,25 @@ def __doDelete(id):
   __db.session().delete(instance)
   __db.session().commit()
   return instance
+
+def recursiveFindContainees(model):
+  results = __db.session().query(Containmentrel, Object) \
+    .filter(Containmentrel.idContainer == model.get('idContainer'), Containmentrel.idContainee == Object.idObject) \
+    .with_entities(Object).all()
+  results = [r.json() for r in results]
+  for r in results:
+    res = recursiveFindContainees({'idContainer': r['idObject']})
+    if len(res) > 0:
+      r['containees'] = res
+  return results
+
 def __doFind(model):
-  results = __db.session().query(Containmentrel).filter_by(**model).all()
+  '''
+  results = __db.session().query(Containmentrel, Object) \
+    .filter(Containmentrel.idContainer == model.get('idContainer'), Containmentrel.idContainee == Object.idObject) \
+    .with_entities(Object).all()
+  '''
+  results = recursiveFindContainees(model)
   return results
 
 
