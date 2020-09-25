@@ -1,6 +1,7 @@
 from flask_restplus import Resource
 from .db import *
 from flask_restplus import fields
+from ..objects import create_model
 
 def init_routes(api, model):
   containee = api.model('containee', {
@@ -10,10 +11,11 @@ def init_routes(api, model):
     'description': fields.String,
     'containees': fields.List(fields.Raw)
   },mask='*')
+  object_model = create_model(api)
   @api.route('/')
   class ListInstances(Resource):
-    @api.doc("list containment relationships")
-    @api.marshal_list_with(model)
+    @api.doc("List all root objects")
+    @api.marshal_list_with(object_model)
     def get(self):
       '''list containment relationships'''
       return listContainmentrels()
