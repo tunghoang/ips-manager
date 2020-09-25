@@ -8,6 +8,7 @@ from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
 from ..roles import Role
+from ..users import User
 import json
 
 __db = DbInstance.getInstance()
@@ -81,11 +82,17 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  user_roles = __db.session().query(Userrolerel, Role)\
-    .filter(Userrolerel.idUser == model['idUser'], Userrolerel.idRole == Role.idRole)\
-    .with_entities(Role)\
-    .all()
-  return user_roles
+  if 'idUser' in model:
+    results = __db.session().query(Userrolerel, Role)\
+      .filter(Userrolerel.idUser == model['idUser'], Userrolerel.idRole == Role.idRole)\
+      .with_entities(Role)\
+      .all()
+  elif 'idRole' in model:
+    results = __db.session().query(Userrolerel, User)\
+      .filter(Userrolerel.idRole == model['idRole'], Userrolerel.idUser == User.idUser)\
+      .with_entities(User).all()
+
+  return [r.json() for r in results]
 
 
 def listUserrolerels():
@@ -153,6 +160,8 @@ def deleteUserrolerel(id):
 def findUserrolerel(model):
   doLog("find DAO function %s" % model)
   try:
+    if 'idRole' in model and 'idUser' in model:
+      return {'message': 'put idRole to get list users of the role, put idUser to get lists roles of the user'}
     return __doFind(model)
   except OperationalError as e:
     doLog(e)
