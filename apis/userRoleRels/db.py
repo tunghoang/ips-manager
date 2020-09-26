@@ -7,9 +7,6 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
-from ..roles import Role
-import json
-
 __db = DbInstance.getInstance()
 
 
@@ -56,7 +53,6 @@ def __doList():
   return __db.session().query(Userrolerel).all()
   
 def __doNew(instance):
-  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -70,22 +66,17 @@ def __doUpdate(id, model):
   instance = getUserrolerel(id)
   if instance == None:
     return {}
-  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getUserrolerel(id)
-  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
 def __doFind(model):
-  user_roles = __db.session().query(Userrolerel, Role)\
-    .filter(Userrolerel.idUser == model['idUser'], Userrolerel.idRole == Role.idRole)\
-    .with_entities(Role)\
-    .all()
-  return user_roles
+  results = __db.session().query(Userrolerel).filter_by(**model).all()
+  return results
 
 
 def listUserrolerels():

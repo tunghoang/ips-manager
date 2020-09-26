@@ -16,9 +16,10 @@ class Permission(__db.Base):
   idPermission = Column(Integer, primary_key = True)
   idRole = Column(Integer, ForeignKey('role.idRole'))
   idObject = Column(Integer, ForeignKey('object.idObject'))
+  action = Column(String(20))
 
   constraints = list()
-  constraints.append(UniqueConstraint('idRole','idObject'))
+  constraints.append(UniqueConstraint('idRole','idObject','action'))
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
@@ -29,13 +30,15 @@ class Permission(__db.Base):
       self.idRole = dictModel["idRole"]
     if ("idObject" in dictModel) and (dictModel["idObject"] != None):
       self.idObject = dictModel["idObject"]
+    if ("action" in dictModel) and (dictModel["action"] != None):
+      self.action = dictModel["action"]
 
   def __repr__(self):
-    return '<Permission idPermission={} idRole={} idObject={} >'.format(self.idPermission, self.idRole, self.idObject, )
+    return '<Permission idPermission={} idRole={} idObject={} action={} >'.format(self.idPermission, self.idRole, self.idObject, self.action, )
 
   def json(self):
     return {
-      "idPermission":self.idPermission,"idRole":self.idRole,"idObject":self.idObject,
+      "idPermission":self.idPermission,"idRole":self.idRole,"idObject":self.idObject,"action":self.action,
     }
 
   def update(self, dictModel):
@@ -45,6 +48,8 @@ class Permission(__db.Base):
       self.idRole = dictModel["idRole"]
     if ("idObject" in dictModel) and (dictModel["idObject"] != None):
       self.idObject = dictModel["idObject"]
+    if ("action" in dictModel) and (dictModel["action"] != None):
+      self.action = dictModel["action"]
 
 def __recover():
   __db.newSession()
@@ -53,7 +58,6 @@ def __doList():
   return __db.session().query(Permission).all()
   
 def __doNew(instance):
-  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -67,13 +71,11 @@ def __doUpdate(id, model):
   instance = getPermission(id)
   if instance == None:
     return {}
-  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getPermission(id)
-  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance

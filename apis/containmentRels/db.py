@@ -6,7 +6,6 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
-from ..objects.db import Object
 
 __db = DbInstance.getInstance()
 
@@ -54,7 +53,6 @@ def __doList():
   return __db.session().query(Containmentrel).all()
   
 def __doNew(instance):
-  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -68,35 +66,16 @@ def __doUpdate(id, model):
   instance = getContainmentrel(id)
   if instance == None:
     return {}
-  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getContainmentrel(id)
-  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
-
-def recursiveFindContainees(model):
-  results = __db.session().query(Containmentrel, Object) \
-    .filter(Containmentrel.idContainer == model.get('idContainer'), Containmentrel.idContainee == Object.idObject) \
-    .with_entities(Object).all()
-  results = [r.json() for r in results]
-  for r in results:
-    res = recursiveFindContainees({'idContainer': r['idObject']})
-    if len(res) > 0:
-      r['containees'] = res
-  return results
-
 def __doFind(model):
-  '''
-  results = __db.session().query(Containmentrel, Object) \
-    .filter(Containmentrel.idContainer == model.get('idContainer'), Containmentrel.idContainee == Object.idObject) \
-    .with_entities(Object).all()
-  '''
-  results = recursiveFindContainees(model)
+  results = __db.session().query(Containmentrel).filter_by(**model).all()
   return results
 
 

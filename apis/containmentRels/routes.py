@@ -1,15 +1,7 @@
 from flask_restplus import Resource
 from .db import *
-from flask_restplus import fields
 
 def init_routes(api, model):
-  containee = api.model('containee', {
-    'idObject': fields.Integer,
-    'name': fields.String,
-    'idEngine': fields.Integer,
-    'description': fields.String,
-    'containees': fields.List(fields.Raw)
-  },mask='*')
   @api.route('/')
   class ListInstances(Resource):
     @api.doc("list containment relationships")
@@ -19,7 +11,7 @@ def init_routes(api, model):
       return listContainmentrels()
     @api.doc('find containment relationships')
     @api.expect(model)
-    @api.marshal_list_with(containee)
+    @api.marshal_list_with(model)
     def put(self):
       '''find containment relationships'''
       return findContainmentrel(api.payload)

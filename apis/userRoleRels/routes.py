@@ -1,9 +1,7 @@
 from flask_restplus import Resource
 from .db import *
-from ..roles.model import create_model
 
 def init_routes(api, model):
-  roleModel = create_model(api)
   @api.route('/')
   class ListInstances(Resource):
     @api.doc("list user-role relationships")
@@ -13,8 +11,7 @@ def init_routes(api, model):
       return listUserrolerels()
     @api.doc('find user-role relationships')
     @api.expect(model)
-    #@api.marshal_list_with(model)  # TUNG
-    @api.marshal_list_with(roleModel)
+    @api.marshal_list_with(model)
     def put(self):
       '''find user-role relationships'''
       return findUserrolerel(api.payload)

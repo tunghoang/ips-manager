@@ -4,6 +4,7 @@ def create_model(api):
   model = api.model('permission', {
     'idPermission': Integer,
     'idRole': Integer,
-    'idObject': Integer 
+    'idObject': Integer,
+    'action': String 
   },mask='*');
   return model
