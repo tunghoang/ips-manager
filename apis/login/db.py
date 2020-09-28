@@ -6,6 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..users import User
 
 __db = DbInstance.getInstance()
 
@@ -67,17 +68,14 @@ def listLogins():
 
 def newLogin(model):
   doLog("new DAO function. model: {}".format(model))
-  instance = Login(model)
-  res = False
-  try:
-    return __doNew(instance)
-  except OperationalError as e:
-    doLog(e)
-    __recover()
-    return __doNew(instance)
-  except SQLAlchemyError as e:
-    __db.session().rollback()
-    raise e
+  # loggin
+  user = __db.session().query(User).filter(User.username == model['username'], User.password == doHash(model['password'])).scalar()
+  if not user:
+    return {'message': 'User or password are incorrect!', 'token': ''}
+
+  token = doGenJWT({'username': user.username})
+  session[user.username] = token
+  return {'message': 'You are logged in', 'token': token}
 
 def getLogin(id):
   doLog("get DAO function", id)

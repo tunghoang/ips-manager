@@ -4,10 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.exceptions import *
 from sqlalchemy.exc import OperationalError
 from configparser import ConfigParser
+from apis import config
 
-config = ConfigParser()
-config.read('config.ini')
-print(config)
 class DbInstance:
   __instance = None
   def __init__(self, conn_str):

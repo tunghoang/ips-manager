@@ -1,5 +1,9 @@
 from flask_restplus import Api
+from configparser import ConfigParser
 api = Api(title="IPS Manager", version="1.0")
+
+config = ConfigParser()
+config.read('config.ini')
 
 from .roles import create_api as create_roles
 api.add_namespace(create_roles())
