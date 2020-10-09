@@ -34,7 +34,7 @@ class User(__db.Base):
 
   def json(self):
     return {
-      "idUser":self.idUser,"username":self.username,"password":self.password,
+      "idUser":self.idUser,"username":self.username
     }
 
   def update(self, dictModel):

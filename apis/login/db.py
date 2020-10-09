@@ -7,6 +7,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 from ..users import User
+import os
 
 __db = DbInstance.getInstance()
 
@@ -71,11 +72,22 @@ def newLogin(model):
   # loggin
   user = __db.session().query(User).filter(User.username == model['username'], User.password == doHash(model['password'])).scalar()
   if not user:
-    return {'message': 'User or password are incorrect!', 'token': ''}
+    return {'message': 'User or password are incorrect!'}
 
-  token = doGenJWT({'username': user.username})
-  session[user.username] = token
-  return {'message': 'You are logged in', 'token': token}
+  key = doHash(str(model['username']))
+  salt = os.urandom(20)
+  session[key] = salt
+  jwt = doGenJWT(user.json(), salt)
+
+  @after_this_request
+  def finalize(response):
+    response.set_cookie('key', key)
+    response.set_cookie('jwt', jwt)
+    response.headers['x-key'] = key
+    response.headers['x-jwt'] = jwt
+    return response
+
+  return user.json()
 
 def getLogin(id):
   doLog("get DAO function", id)
