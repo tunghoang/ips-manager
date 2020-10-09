@@ -29,7 +29,7 @@ def before_request():
   no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
   no_auth_prefixes = ( '/swaggerui', 
     '/roles', '/objects', '/userRoleRels',
-    '/login', '/logout', '/enginetypes', '/engines',
+    '/login', '/enginetypes', '/engines',
     '/permissions', '/containmentRels'
   )
 
@@ -41,6 +41,8 @@ def before_request():
 
   if key not in session:
     raise Unauthorized("You are not login")
+
+  print(session)
 
   decoded = doParseJWT(jwt, session[key])
 
