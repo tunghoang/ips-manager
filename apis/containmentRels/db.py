@@ -51,7 +51,11 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Containmentrel).all()
+  res = __db.session().query(Object, Containmentrel)\
+    .join(Containmentrel, Object.idObject == Containmentrel.idContainee, isouter=True)\
+    .filter(Containmentrel.idContainmentRel == None)\
+    .with_entities(Object).all()
+  return res
   
 def __doNew(instance):
   __db.session().rollback();

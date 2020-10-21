@@ -2,10 +2,12 @@ from flask import Flask, session, request
 from apis import api
 from apis.db_utils import DbInstance
 from apis.app_utils import *
-#from flask_session import Session
+from flask_session import Session
 from werkzeug.exceptions import *
 from werkzeug.contrib.fixers import ProxyFix
 import os
+from flask import g
+
 
 db = DbInstance.getInstance()
 
@@ -17,7 +19,7 @@ app.config['SESSION_FILE_DIR'] = '/tmp'
 app.secret_key = os.urandom(16)
 api.init_app(app)
 
-#Session(app)
+Session(app)
 
 @app.before_request
 def before_request():
@@ -25,25 +27,26 @@ def before_request():
   jwt = request.cookies.get('jwt')
   key = key if key is not None else request.headers.get('auth-key')
   jwt = jwt if jwt is not None else request.headers.get('authorization')
+
   no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
   no_auth_prefixes = ( '/swaggerui', 
-    '/users', '/roles', '/objects', '/userRoleRels', 
+    '/roles', '/objects', '/userRoleRels',
     '/login', '/logout', '/enginetypes', '/engines',
     '/permissions', '/containmentRels'
   )
 
   if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None
-  elif jwt is None or key is None:
+
+  if key is None or jwt is None:
     raise Unauthorized("Invalid request")
-  elif key in session:
-    salt = session[key]
-    try:
-      sessionData = doParseJWT(jwt, salt)
-    except:
-      raise Unauthorized("Invalid session")
-  else:
-    raise Unauthorized("Not login")
+
+  if key not in session:
+    raise Unauthorized("You are not login")
+
+  decoded = doParseJWT(jwt, session[key])
+
+  g.username = decoded['username']
 
   return None
 
