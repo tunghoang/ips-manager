@@ -57,7 +57,6 @@ def __doList():
   return __db.session().query(Object).all()
   
 def __doNew(instance):
-  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -71,13 +70,11 @@ def __doUpdate(id, model):
   instance = getObject(id)
   if instance == None:
     return {}
-  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getObject(id)
-  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance

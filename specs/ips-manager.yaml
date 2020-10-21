@@ -203,10 +203,14 @@ namespaces:
       - name: idObject
         type: Integer
         foreign_key: object.idObject
+      - name: action
+        type: String
+        type_specs: (20)
     uniques:
       - keys:
         - name: idRole
         - name: idObject
+        - name: action
     list_api: list permissions
     list_api_description: list permissions
     new_api: new permission

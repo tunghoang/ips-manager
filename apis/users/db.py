@@ -52,7 +52,6 @@ def __doList():
   return __db.session().query(User).all()
   
 def __doNew(instance):
-  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -66,13 +65,11 @@ def __doUpdate(id, model):
   instance = getUser(id)
   if instance == None:
     return {}
-  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getUser(id)
-  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
@@ -95,7 +92,6 @@ def listUsers():
 
 def newUser(model):
   doLog("new DAO function. model: {}".format(model))
-  model['password'] = doHash(model['password'])
   instance = User(model)
   res = False
   try:
@@ -123,8 +119,6 @@ def getUser(id):
 def updateUser(id, model):
   doLog("update DAO function. Model: {}".format(model))
   try:
-    if 'password' in model:
-      model['password'] = doHash(model['password'])
     return __doUpdate(id, model)
   except OperationalError as e:
     doLog(e)

@@ -12,6 +12,7 @@ def init_routes(api, model):
     'containees': fields.List(fields.Raw)
   },mask='*')
   object_model = create_model(api)
+
   @api.route('/')
   class ListInstances(Resource):
     @api.doc("List all root objects")
@@ -21,7 +22,7 @@ def init_routes(api, model):
       return listContainmentrels()
     @api.doc('find containment relationships')
     @api.expect(model)
-    @api.marshal_list_with(containee)
+    @api.marshal_list_with(model)
     def put(self):
       '''find containment relationships'''
       return findContainmentrel(api.payload)

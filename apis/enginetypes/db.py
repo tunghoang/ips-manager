@@ -52,7 +52,6 @@ def __doList():
   return __db.session().query(Enginetype).all()
   
 def __doNew(instance):
-  __db.session().rollback();
   __db.session().add(instance)
   __db.session().commit()
   return instance
@@ -66,13 +65,11 @@ def __doUpdate(id, model):
   instance = getEnginetype(id)
   if instance == None:
     return {}
-  __db.session().rollback()
   instance.update(model)
   __db.session().commit()
   return instance
 def __doDelete(id):
   instance = getEnginetype(id)
-  __db.rollback()
   __db.session().delete(instance)
   __db.session().commit()
   return instance
