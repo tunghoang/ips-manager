@@ -31,9 +31,9 @@ def doClear(dict):
   keys = [ k for k in dict ]
   for key in keys:
     del dict[key]
-def matchOneOf(str, prefixes):
+def matchOneOf(request, prefixes):
   for prefix in prefixes:
-    if str.startswith(prefix):
+    if request.path.startswith(prefix[0]) and (prefix[1] is None or request.method == prefix[1]):
       return True
   return False
 

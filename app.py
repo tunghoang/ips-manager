@@ -27,13 +27,11 @@ def before_request():
   jwt = jwt if jwt is not None else request.headers.get('authorization')
 
   no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
-  no_auth_prefixes = ( '/swaggerui', 
-    '/roles', '/objects', '/userRoleRels',
-    '/login', '/enginetypes', '/engines',
-    '/permissions', '/containmentRels'
-  )
+  no_auth_prefixes = ( ('/swaggerui', None),
+                       ('/login', None),
+                       ('/users', 'POST'))
 
-  if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
+  if request.path in no_auth_routes or matchOneOf(request, no_auth_prefixes):
     return None
 
   if key is None or jwt is None:
