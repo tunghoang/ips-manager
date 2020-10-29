@@ -1,5 +1,6 @@
 from flask_restplus import Resource
 from .db import *
+from flask import g
 
 def init_routes(api, model):
   @api.route('/')
@@ -41,3 +42,14 @@ def init_routes(api, model):
       '''delete user'''
       return deleteUser(id)
     pass
+
+  @api.route('/current')
+  class CurrentUser(Instance):
+    @api.doc("Get current user")
+    def get(self):
+      roles = getRolesOfUser({'idUser': g.idUser})
+
+      return {
+        "idUser": g.idUser,
+        "username": g.username,
+        "roles": roles}

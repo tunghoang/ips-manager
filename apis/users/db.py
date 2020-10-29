@@ -6,44 +6,9 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
-
 __db = DbInstance.getInstance()
-
-
-
-class User(__db.Base):
-  __tablename__ = "user"
-  idUser = Column(Integer, primary_key = True)
-  username = Column(String(50))
-  password = Column(String(100))
-
-  constraints = list()
-  if len(constraints) > 0:
-    __table_args__ = tuple(constraints)
- 
-  def __init__(self, dictModel):
-    if ("idUser" in dictModel) and (dictModel["idUser"] != None):
-      self.idUser = dictModel["idUser"]
-    if ("username" in dictModel) and (dictModel["username"] != None):
-      self.username = dictModel["username"]
-    if ("password" in dictModel) and (dictModel["password"] != None):
-      self.password = dictModel["password"]
-
-  def __repr__(self):
-    return '<User idUser={} username={} password={} >'.format(self.idUser, self.username, self.password, )
-
-  def json(self):
-    return {
-      "idUser":self.idUser,"username":self.username
-    }
-
-  def update(self, dictModel):
-    if ("idUser" in dictModel) and (dictModel["idUser"] != None):
-      self.idUser = dictModel["idUser"]
-    if ("username" in dictModel) and (dictModel["username"] != None):
-      self.username = dictModel["username"]
-    if ("password" in dictModel) and (dictModel["password"] != None):
-      self.password = dictModel["password"]
+from .user import User
+from ..userRoleRels.db import findUserrolerel
 
 def __recover():
   __db.newSession()
@@ -157,3 +122,11 @@ def findUser(model):
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e
+
+def getRolesOfUser(model):
+  """
+
+  :param model: {idUser: 1}
+  :return:
+  """
+  return findUserrolerel(model)

@@ -1,6 +1,6 @@
 from .model import create_model
 from .routes import init_routes
-from .db import Role
+from .role import Role
 from flask_restplus import Namespace
 
 def create_api():

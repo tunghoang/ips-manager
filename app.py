@@ -46,7 +46,11 @@ def before_request():
 
   decoded = doParseJWT(jwt, session[key])
 
+  if not decoded:
+    raise Unauthorized("You are not login")
+
   g.username = decoded['username']
+  g.idUser = decoded['idUser']
 
   return None
 

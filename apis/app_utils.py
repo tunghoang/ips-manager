@@ -3,6 +3,8 @@ from flask import jsonify
 from jwt import encode, decode
 from apis import config
 import time
+from functools import wraps
+
 print(config)
 SALT = 'uet-ips-man'
 JWT_SETCRET = config.get('Default', 'JWT_SECRET', fallback='thisissecret')
@@ -34,3 +36,11 @@ def matchOneOf(str, prefixes):
     if str.startswith(prefix):
       return True
   return False
+
+def require_permission(permission: str):
+  def inner(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+      return f(*args, **kwargs)
+    return decorated
+  return inner

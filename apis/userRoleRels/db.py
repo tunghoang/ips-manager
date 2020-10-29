@@ -1,54 +1,18 @@
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
-from sqlalchemy.exc import *
 from ..db_utils import DbInstance
+from sqlalchemy.exc import *
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
 from ..roles import Role
-from ..users import User
-import json
+from ..users.user import User
+from .userRoleRel import Userrolerel
 
 __db = DbInstance.getInstance()
 
-
-
-class Userrolerel(__db.Base):
-  __tablename__ = "userRoleRel"
-  idUserRoleRel = Column(Integer, primary_key = True)
-  idRole = Column(Integer, ForeignKey('role.idRole'))
-  idUser = Column(Integer, ForeignKey('user.idUser'))
-
-  constraints = list()
-  constraints.append(UniqueConstraint('idRole','idUser'))
-  if len(constraints) > 0:
-    __table_args__ = tuple(constraints)
- 
-  def __init__(self, dictModel):
-    if ("idUserRoleRel" in dictModel) and (dictModel["idUserRoleRel"] != None):
-      self.idUserRoleRel = dictModel["idUserRoleRel"]
-    if ("idRole" in dictModel) and (dictModel["idRole"] != None):
-      self.idRole = dictModel["idRole"]
-    if ("idUser" in dictModel) and (dictModel["idUser"] != None):
-      self.idUser = dictModel["idUser"]
-
-  def __repr__(self):
-    return '<Userrolerel idUserRoleRel={} idRole={} idUser={} >'.format(self.idUserRoleRel, self.idRole, self.idUser, )
-
-  def json(self):
-    return {
-      "idUserRoleRel":self.idUserRoleRel,"idRole":self.idRole,"idUser":self.idUser,
-    }
-
-  def update(self, dictModel):
-    if ("idUserRoleRel" in dictModel) and (dictModel["idUserRoleRel"] != None):
-      self.idUserRoleRel = dictModel["idUserRoleRel"]
-    if ("idRole" in dictModel) and (dictModel["idRole"] != None):
-      self.idRole = dictModel["idRole"]
-    if ("idUser" in dictModel) and (dictModel["idUser"] != None):
-      self.idUser = dictModel["idUser"]
 
 def __recover():
   __db.newSession()
