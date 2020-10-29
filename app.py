@@ -29,14 +29,11 @@ def before_request():
   jwt = jwt if jwt is not None else request.headers.get('authorization')
 
   no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
-  #no_auth_prefixes = ( '/swaggerui', 
-  #  '/users', '/roles', '/objects', '/userRoleRels', 
-  #  '/login', '/logout', '/enginetypes', '/engines',
-  #  '/permissions', '/containmentRels'
-  #)
-  no_auth_prefixes = ( '/swaggerui', '/login' )
+  no_auth_prefixes = ( ('/swaggerui', None),
+                       ('/login', None),
+                       ('/users', 'POST'))
 
-  if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
+  if request.path in no_auth_routes or matchOneOf(request, no_auth_prefixes):
     return None
 
   if key is None or jwt is None:
@@ -45,9 +42,15 @@ def before_request():
   if key not in session:
     raise Unauthorized("You are not login")
 
+  print(session)
+
   decoded = doParseJWT(jwt, session[key])
 
+  if not decoded:
+    raise Unauthorized("You are not login")
+
   g.username = decoded['username']
+  g.idUser = decoded['idUser']
 
   return None
 

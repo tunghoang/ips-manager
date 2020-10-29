@@ -3,6 +3,8 @@ from flask import jsonify
 from jwt import encode, decode
 from apis import config
 import time
+from functools import wraps
+
 print(config)
 SALT = 'uet-ips-man'
 JWT_SETCRET = config.get('Default', 'JWT_SECRET', fallback='thisissecret')
@@ -29,8 +31,16 @@ def doClear(dict):
   keys = [ k for k in dict ]
   for key in keys:
     del dict[key]
-def matchOneOf(str, prefixes):
+def matchOneOf(request, prefixes):
   for prefix in prefixes:
-    if str.startswith(prefix):
+    if request.path.startswith(prefix[0]) and (prefix[1] is None or request.method == prefix[1]):
       return True
   return False
+
+def require_permission(permission: str):
+  def inner(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+      return f(*args, **kwargs)
+    return decorated
+  return inner

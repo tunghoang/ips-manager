@@ -6,6 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from flask import g
 
 __db = DbInstance.getInstance()
 
@@ -33,6 +34,9 @@ def __recover():
   pass
 
 def __doList():
+  print(session)
+  session.clear()
+  print(session)
   return []
   
 def __doNew(instance):
