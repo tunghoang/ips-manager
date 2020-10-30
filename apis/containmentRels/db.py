@@ -81,8 +81,23 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Containmentrel).filter_by(**model).all()
-  return results
+  queryObj = __db.session().query(
+    Containmentrel.idContainmentrel, 
+    Containmentrel.idContainer, 
+    Containmentrel.idContainee,
+    Object.name,
+    Object.description,
+    Object.idEngine
+  ).filter(
+    Containmentrel.idContainee == Object.idObject
+  )
+  if 'idContainer' in model:
+    queryObj = queryObj.filter(Containmentrel.idContainer == model['idContainer'])
+  else:
+    return []
+  results = queryObj.all()
+  return list(map(lambda x: {'idContainmentrel':x[0], 'idContainer': x[1], 'idObject': x[2], 'name': x[3], 'description': x[4], 'idEngine': x[5]},results))
+  #return results
 
 
 def listContainmentrels():
