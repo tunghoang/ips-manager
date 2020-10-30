@@ -14,7 +14,7 @@ __db = DbInstance.getInstance()
 
 class Containmentrel(__db.Base):
   __tablename__ = "containmentRel"
-  idContainmentRel = Column(Integer, primary_key = True)
+  idContainmentrel = Column(Integer, primary_key = True)
   idContainer = Column(Integer, ForeignKey('object.idObject'))
   idContainee = Column(Integer, ForeignKey('object.idObject'))
 
@@ -24,24 +24,24 @@ class Containmentrel(__db.Base):
     __table_args__ = tuple(constraints)
  
   def __init__(self, dictModel):
-    if ("idContainmentRel" in dictModel) and (dictModel["idContainmentRel"] != None):
-      self.idContainmentRel = dictModel["idContainmentRel"]
+    if ("idContainmentrel" in dictModel) and (dictModel["idContainmentrel"] != None):
+      self.idContainmentrel = dictModel["idContainmentrel"]
     if ("idContainer" in dictModel) and (dictModel["idContainer"] != None):
       self.idContainer = dictModel["idContainer"]
     if ("idContainee" in dictModel) and (dictModel["idContainee"] != None):
       self.idContainee = dictModel["idContainee"]
 
   def __repr__(self):
-    return '<Containmentrel idContainmentRel={} idContainer={} idContainee={} >'.format(self.idContainmentRel, self.idContainer, self.idContainee, )
+    return '<Containmentrel idContainmentrel={} idContainer={} idContainee={} >'.format(self.idContainmentrel, self.idContainer, self.idContainee, )
 
   def json(self):
     return {
-      "idContainmentRel":self.idContainmentRel,"idContainer":self.idContainer,"idContainee":self.idContainee,
+      "idContainmentrel":self.idContainmentrel,"idContainer":self.idContainer,"idContainee":self.idContainee,
     }
 
   def update(self, dictModel):
-    if ("idContainmentRel" in dictModel) and (dictModel["idContainmentRel"] != None):
-      self.idContainmentRel = dictModel["idContainmentRel"]
+    if ("idContainmentrel" in dictModel) and (dictModel["idContainmentrel"] != None):
+      self.idContainmentrel = dictModel["idContainmentrel"]
     if ("idContainer" in dictModel) and (dictModel["idContainer"] != None):
       self.idContainer = dictModel["idContainer"]
     if ("idContainee" in dictModel) and (dictModel["idContainee"] != None):

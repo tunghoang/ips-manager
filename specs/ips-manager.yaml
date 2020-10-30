@@ -165,7 +165,7 @@ namespaces:
     ns_description: containment relationships. This will implement grouping capability
     resource_name: containmentRel
     props:
-      - name: idContainmentRel
+      - name: idContainmentrel
         type: Integer
         primary_key: yes
       - name: idContainer
