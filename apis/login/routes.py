@@ -11,7 +11,7 @@ def init_routes(api, model):
       return listLogins()
     @api.doc('do login', body=model)
     @api.expect(model)
-    # @api.marshal_with(model)
+    @api.marshal_with(model)
     def post(self):
       '''do login'''
       return newLogin(api.payload)

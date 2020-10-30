@@ -43,7 +43,27 @@ def __doList():
   return []
   
 def __doNew(instance):
-  return {}
+  hash_pw = doHash(str(instance.password))
+  user = __db.session().query(User).filter(User.username == instance.username).first()
+  if user is None:
+    raise BadRequest('No user found')
+  elif user.password != hash_pw:
+    raise BadRequest('Incorrect password %s %s %s' % (instance.password, hash_pw, user.password))
+  else:
+    key = doHash(str(instance.username))
+    salt = os.urandom(20)
+    session[key] = salt
+    jwt = doGenJWT(user.json(), salt)
+    @after_this_request
+    def finalize(response):
+      response.set_cookie('key', key)
+      response.set_cookie('jwt', jwt)
+      response.headers['x-key'] = key
+      response.headers['x-jwt'] = jwt
+      return response
+
+    return user
+
 
 def __doUpdate(id, model):
   return {}
@@ -69,25 +89,17 @@ def listLogins():
 
 def newLogin(model):
   doLog("new DAO function. model: {}".format(model))
-  # loggin
-  user = __db.session().query(User).filter(User.username == model['username'], User.password == doHash(model['password'])).scalar()
-  if not user:
-    return {'message': 'User or password are incorrect!'}
-
-  key = doHash(str(model['username']))
-  salt = os.urandom(20)
-  session[key] = salt
-  jwt = doGenJWT(user.json(), salt)
-
-  @after_this_request
-  def finalize(response):
-    response.set_cookie('key', key)
-    response.set_cookie('jwt', jwt)
-    response.headers['x-key'] = key
-    response.headers['x-jwt'] = jwt
-    return response
-
-  return user.json()
+  instance = Login(model)
+  res = False
+  try:
+    return __doNew(instance)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doNew(instance)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
 
 def getLogin(id):
   doLog("get DAO function", id)

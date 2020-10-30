@@ -30,27 +30,27 @@ def before_request():
 
   no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
   no_auth_prefixes = ( '/swaggerui', '/login' )
+  #no_auth_prefixes = ( '/' )
 
-  if request.path in no_auth_routes or matchOneOf(request, no_auth_prefixes):
+  if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
     return None
-
-  if key is None or jwt is None:
+  elif jwt is None or key is None:
+    doLog("Invalid request")
     raise Unauthorized("Invalid request")
+  elif key in session:
+    doLog('Check session')
+    salt = session[key]
+    try:
+      decoded = doParseJWT(jwt, salt)
+      if not decoded:
+        raise Unauthorized("Invalid token")
+      g.username = decoded['username']
+      g.idUser = decoded['idUser']
 
-  if key not in session:
-    raise Unauthorized("You are not login")
-
-  print(session)
-
-  decoded = doParseJWT(jwt, session[key])
-
-  if not decoded:
-    raise Unauthorized("You are not login")
-
-  g.username = decoded['username']
-  g.idUser = decoded['idUser']
-
-  return None
+    except:
+      raise Unauthorized("Invalid session")
+  else:
+    raise Unauthorized("Not login")
 
 db.Base.metadata.create_all(db.engine)
 

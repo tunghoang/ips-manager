@@ -31,11 +31,17 @@ def doClear(dict):
   keys = [ k for k in dict ]
   for key in keys:
     del dict[key]
-def matchOneOf(request, prefixes):
+
+def matchOneOf(str, prefixes):
   for prefix in prefixes:
-    if request.path.startswith(prefix[0]) and (prefix[1] is None or request.method == prefix[1]):
+    if str.startswith(prefix):
       return True
   return False
+#def matchOneOf(request, prefixes):
+#  for prefix in prefixes:
+#    if request.path.startswith(prefix[0]) and (prefix[1] is None or request.method == prefix[1]):
+#      return True
+#  return False
 
 def require_permission(permission: str):
   def inner(f):

@@ -17,6 +17,7 @@ def __doList():
   return __db.session().query(User).all()
   
 def __doNew(instance):
+  instance.password = doHash(instance.password)
   __db.session().add(instance)
   __db.session().commit()
   return instance

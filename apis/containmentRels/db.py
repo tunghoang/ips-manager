@@ -6,6 +6,7 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..objects import Object
 
 __db = DbInstance.getInstance()
 
@@ -54,6 +55,7 @@ def __doList():
     .join(Containmentrel, Object.idObject == Containmentrel.idContainee, isouter=True)\
     .filter(Containmentrel.idContainmentRel == None)\
     .with_entities(Object).all()
+  doLog(res)
   return res
   
 def __doNew(instance):
