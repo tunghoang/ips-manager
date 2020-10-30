@@ -2,6 +2,7 @@ from flask import Flask, session, request
 from apis import api
 from apis.db_utils import DbInstance
 from apis.app_utils import *
+from flask_session import Session
 from werkzeug.exceptions import *
 from werkzeug.contrib.fixers import ProxyFix
 import os
@@ -18,6 +19,7 @@ app.config['SESSION_FILE_DIR'] = '/tmp'
 app.secret_key = os.urandom(16)
 api.init_app(app)
 
+Session(app)
 
 @app.before_request
 def before_request():
@@ -29,7 +31,7 @@ def before_request():
   no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
   no_auth_prefixes = ( '/swaggerui', '/login' )
 
-  if request.path in no_auth_routes or matchOneOf(request.path, no_auth_prefixes) :
+  if request.path in no_auth_routes or matchOneOf(request, no_auth_prefixes):
     return None
 
   if key is None or jwt is None:
@@ -38,9 +40,15 @@ def before_request():
   if key not in session:
     raise Unauthorized("You are not login")
 
+  print(session)
+
   decoded = doParseJWT(jwt, session[key])
 
+  if not decoded:
+    raise Unauthorized("You are not login")
+
   g.username = decoded['username']
+  g.idUser = decoded['idUser']
 
   return None
 
