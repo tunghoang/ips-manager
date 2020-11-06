@@ -11,7 +11,7 @@ def init_routes(api, model):
       return listPermissions()
     @api.doc('find permissions')
     @api.expect(model)
-    @api.marshal_list_with(model)
+    #@api.marshal_list_with(model)
     def put(self):
       '''find permissions'''
       return findPermission(api.payload)

@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text, or_
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
@@ -6,6 +6,9 @@ from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+
+from ..roles import Role
+from ..objects import Object
 
 __db = DbInstance.getInstance()
 
@@ -80,8 +83,33 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  results = __db.session().query(Permission).filter_by(**model).all()
-  return results
+  queryObj = __db.session().query(
+    Permission.idPermission, Permission.action,
+    Role.idRole, Role.name, Role.description,
+    Object.idObject, Object.name, Object.description, Object.idEngine
+  ).filter(
+    Permission.idRole == Role.idRole,
+    or_(Permission.idObject == Object.idObject, Permission.idObject is None)
+  )
+
+  if 'idRole' in model:
+    queryObj = queryObj.filter(Permission.idRole == model['idRole'])
+
+  if 'idObject' in model:
+    queryObj = queryObj.filter(Permission.idObject == model['idObject'])
+
+  results = queryObj.all()
+  return list(map(lambda x: {
+    'idPermission': x[0],
+    'action': x[1],
+    'idRole': x[2],
+    'roleName': x[3],
+    'roleDescription': x[4],
+    'idObject': x[5],
+    'objectName': x[6],
+    'objectDescription': x[7],
+    'idEngine': x[8]
+  },results))
 
 
 def listPermissions():

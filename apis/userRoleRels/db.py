@@ -43,18 +43,29 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
+  queryObj = __db.session().query(
+    Userrolerel.idUser, 
+    Role.idRole, Role.name, Role.description, 
+    User.idUser, User.username
+  ).filter(
+    Userrolerel.idUser == User.idUser,
+    Userrolerel.idRole == Role.idRole
+  )
   if 'idUser' in model:
-    results = __db.session().query(Userrolerel, Role)\
-      .filter(Userrolerel.idUser == model['idUser'], Userrolerel.idRole == Role.idRole)\
-      .with_entities(Role)\
-      .all()
-  elif 'idRole' in model:
-    results = __db.session().query(Userrolerel, User)\
-      .filter(Userrolerel.idRole == model['idRole'], Userrolerel.idUser == User.idUser)\
-      .with_entities(User).all()
+    queryObj = queryObj.filter(Userrolerel.idUser == model['idUser'])
+  if 'idRole' in model:
+    queryObj = queryObj.filter(Userrolerel.idRole == model['idRole'])
+  
+  results = queryObj.all()
 
-  return [r.json() for r in results]
-
+  return list(map(lambda x: {
+    'idUserrolerel': x[0],
+    'idRole': x[1],
+    'roleName': x[2],
+    'roleDescription': x[3],
+    'idUser': x[4],
+    'username': x[5]
+  }, results))
 
 def listUserrolerels():
   doLog("list DAO function")

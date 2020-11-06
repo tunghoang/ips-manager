@@ -5,7 +5,7 @@ __db = DbInstance.getInstance()
 
 class Userrolerel(__db.Base):
     __tablename__ = "userRoleRel"
-    idUserRoleRel = Column(Integer, primary_key = True)
+    idUserrolerel = Column(Integer, primary_key = True)
     idRole = Column(Integer, ForeignKey('role.idRole'))
     idUser = Column(Integer, ForeignKey('user.idUser'))
 
@@ -15,24 +15,24 @@ class Userrolerel(__db.Base):
         __table_args__ = tuple(constraints)
 
     def __init__(self, dictModel):
-        if ("idUserRoleRel" in dictModel) and (dictModel["idUserRoleRel"] != None):
-            self.idUserRoleRel = dictModel["idUserRoleRel"]
+        if ("idUserrolerel" in dictModel) and (dictModel["idUserrolerel"] != None):
+            self.idUserrolerel = dictModel["idUserrolerel"]
         if ("idRole" in dictModel) and (dictModel["idRole"] != None):
             self.idRole = dictModel["idRole"]
         if ("idUser" in dictModel) and (dictModel["idUser"] != None):
             self.idUser = dictModel["idUser"]
 
     def __repr__(self):
-        return '<Userrolerel idUserRoleRel={} idRole={} idUser={} >'.format(self.idUserRoleRel, self.idRole, self.idUser, )
+        return '<Userrolerel idUserrolerel={} idRole={} idUser={} >'.format(self.idUserrolerel, self.idRole, self.idUser, )
 
     def json(self):
         return {
-            "idUserRoleRel" :self.idUserRoleRel ,"idRole" :self.idRole ,"idUser" :self.idUser,
+            "idUserrolerel" :self.idUserrolerel ,"idRole" :self.idRole ,"idUser" :self.idUser,
         }
 
     def update(self, dictModel):
-        if ("idUserRoleRel" in dictModel) and (dictModel["idUserRoleRel"] != None):
-            self.idUserRoleRel = dictModel["idUserRoleRel"]
+        if ("idUserrolerel" in dictModel) and (dictModel["idUserrolerel"] != None):
+            self.idUserrolerel = dictModel["idUserrolerel"]
         if ("idRole" in dictModel) and (dictModel["idRole"] != None):
             self.idRole = dictModel["idRole"]
         if ("idUser" in dictModel) and (dictModel["idUser"] != None):

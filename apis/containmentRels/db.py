@@ -53,7 +53,7 @@ def __recover():
 def __doList():
   res = __db.session().query(Object, Containmentrel)\
     .join(Containmentrel, Object.idObject == Containmentrel.idContainee, isouter=True)\
-    .filter(Containmentrel.idContainmentRel == None)\
+    .filter(Containmentrel.idContainmentrel == None)\
     .with_entities(Object).all()
   doLog(res)
   return res

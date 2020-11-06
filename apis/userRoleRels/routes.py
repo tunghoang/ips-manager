@@ -11,7 +11,7 @@ def init_routes(api, model):
       return listUserrolerels()
     @api.doc('find user-role relationships')
     @api.expect(model)
-    @api.marshal_list_with(model)
+    #@api.marshal_list_with(model)
     def put(self):
       '''find user-role relationships'''
       return findUserrolerel(api.payload)
