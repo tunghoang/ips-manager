@@ -89,7 +89,7 @@ def __doFind(model):
     Object.idObject, Object.name, Object.description, Object.idEngine
   ).filter(
     Permission.idRole == Role.idRole,
-    or_(Permission.idObject == Object.idObject, Permission.idObject is None)
+    Permission.idObject == Object.idObject
   )
 
   if 'idRole' in model:
@@ -99,7 +99,7 @@ def __doFind(model):
     queryObj = queryObj.filter(Permission.idObject == model['idObject'])
 
   results = queryObj.all()
-  return list(map(lambda x: {
+  l = list(map(lambda x: {
     'idPermission': x[0],
     'action': x[1],
     'idRole': x[2],
@@ -110,7 +110,35 @@ def __doFind(model):
     'objectDescription': x[7],
     'idEngine': x[8]
   },results))
+  doLog(l)
 
+  queryObj1 = __db.session().query(
+    Permission.idPermission, Permission.action, 
+    Role.idRole, Role.name, Role.description, Permission.idObject 
+  ).filter(
+    Permission.idRole == Role.idRole,
+    Permission.idObject == None
+  )
+
+  if 'idRole' in model:
+    queryObj1 = queryObj1.filter(Permission.idRole == model['idRole'])
+
+  results1 = queryObj1.all()
+
+  l1 = list(map(lambda x: {
+    'idPermission': x[0],
+    'action': x[1],
+    'idRole': x[2],
+    'roleName': x[3],
+    'roleDescription': x[4],
+    'idObject': x[5],
+    'objectName': None,
+    'objectDescription': None,
+    'idEngine': None
+  },results1))
+  doLog("Haahahahaha")
+  doLog(l1)
+  return l1 + l
 
 def listPermissions():
   doLog("list DAO function")
