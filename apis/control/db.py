@@ -121,3 +121,7 @@ def findControl(model):
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e
+
+def getStatus(idObject):
+  doLog('getStatus ', idObject)
+  return {'online': True, 'enabled': True, 'data': "lorem ipsum"}

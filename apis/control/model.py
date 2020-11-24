@@ -5,3 +5,11 @@ def create_model(api):
     'dummy': Integer 
   },mask='*');
   return model
+
+def create_status_report(api):
+  model = api.model('statusReport', {
+    'online': Boolean,
+    'enabled': Boolean,
+    'data': String
+  },mask='*');
+  return model
