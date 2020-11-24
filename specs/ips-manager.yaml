@@ -245,3 +245,12 @@ namespaces:
         type: String
     list_api: do logout
     list_api_description: do logout
+  - ns_name: control
+    ns_description: node controls
+    resource_name: control
+    nodb: yes
+    props:
+      - name: dummy
+        type: Integer
+    list_api: dummy api
+    list_api_description: dummy
