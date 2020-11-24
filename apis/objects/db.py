@@ -15,8 +15,10 @@ class Object(__db.Base):
   __tablename__ = "object"
   idObject = Column(Integer, primary_key = True)
   name = Column(String(50))
-  idEngine = Column(Integer, ForeignKey('engine.idEngine'))
+  idEngine = Column(Integer, ForeignKey('engine.idEngine', ondelete='CASCADE'))
   description = Column(String(255))
+
+
 
   constraints = list()
   if len(constraints) > 0:

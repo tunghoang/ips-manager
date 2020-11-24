@@ -17,8 +17,8 @@ __db = DbInstance.getInstance()
 class Permission(__db.Base):
   __tablename__ = "permission"
   idPermission = Column(Integer, primary_key = True)
-  idRole = Column(Integer, ForeignKey('role.idRole'))
-  idObject = Column(Integer, ForeignKey('object.idObject'))
+  idRole = Column(Integer, ForeignKey('role.idRole', ondelete="CASCADE"))
+  idObject = Column(Integer, ForeignKey('object.idObject', ondelete="CASCADE"))
   action = Column(String(20))
 
   constraints = list()

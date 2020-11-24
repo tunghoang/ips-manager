@@ -16,7 +16,7 @@ class Containmentrel(__db.Base):
   __tablename__ = "containmentRel"
   idContainmentrel = Column(Integer, primary_key = True)
   idContainer = Column(Integer, ForeignKey('object.idObject'))
-  idContainee = Column(Integer, ForeignKey('object.idObject'))
+  idContainee = Column(Integer, ForeignKey('object.idObject', ondelete="CASCADE"))
 
   constraints = list()
   constraints.append(UniqueConstraint('idContainer','idContainee'))
