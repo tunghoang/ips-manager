@@ -6,8 +6,9 @@ def create_model(api):
   },mask='*');
   return model
 
-def create_status_report(api):
-  model = api.model('statusReport', {
+def create_response_model(api):
+  model = api.model('controlResponse', {
+    'success': Boolean,
     'online': Boolean,
     'enabled': Boolean,
     'data': String

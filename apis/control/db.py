@@ -7,6 +7,10 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+import json
+from ..objects import Object
+from ..engines import Engine
+
 __db = DbInstance.getInstance()
 
 
@@ -122,6 +126,49 @@ def findControl(model):
     __db.session().rollback()
     raise e
 
+def getEngineSpecs(idObject):
+  try:
+    results = __db.session().query(
+      Object.name, 
+      Engine.specs
+    ).filter(
+      Object.idEngine == Engine.idEngine,
+      Object.idObject == idObject
+    ).all()
+    if len(results) > 0:
+      doLog(results[0][1])
+      return json.loads(results[0][1])
+    else:
+      return None
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return getEngineSpecs(idObject)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
 def getStatus(idObject):
   doLog('getStatus ', idObject)
-  return {'online': True, 'enabled': True, 'data': "lorem ipsum"}
+  specs = getEngineSpecs(idObject)
+  doLog(specs)
+  if specs:
+    # prob for status
+    return {'success': True, 'online': True, 'enabled': True, 'data': specs}
+  return {'success': False, 'data': 'No specs'}
+
+def doStart(idObject):
+  doLog('doStart ', idObject)
+  specs = getEngineSpecs(idObject)
+  if specs:
+    # send start command
+    return {'success': True, 'online': True, 'enabled': True, 'data': specs}
+  return {'success': False, 'data': 'No specs'}
+
+def doStop(idObject):
+  doLog('doStop ', idObject)
+  specs = getEngineSpecs(idObject)
+  if specs:
+    # send stop command
+    return {'success': True, 'online': True, 'enabled': True, 'data': specs}
+  return {'success': False, 'data': 'No specs'}
