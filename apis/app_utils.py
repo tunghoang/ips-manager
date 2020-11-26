@@ -4,6 +4,7 @@ from jwt import encode, decode
 from apis import config
 import time
 from functools import wraps
+from http import client
 
 print(config)
 SALT = 'uet-ips-man'
@@ -50,3 +51,15 @@ def require_permission(permission: str):
       return f(*args, **kwargs)
     return decorated
   return inner
+
+def make_get_request(base, path):
+  doLog('do GET' + str(base) + str(path))
+  conn = client.HTTPConnection(base)
+  conn.request('GET', path)
+  response = conn.getresponse()
+  data = response.read()
+  conn.close()
+  if response.status == 200:
+    return True, data
+  else:
+    return False, data

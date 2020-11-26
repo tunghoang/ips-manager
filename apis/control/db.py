@@ -149,26 +149,53 @@ def getEngineSpecs(idObject):
     raise e
 
 def getStatus(idObject):
-  doLog('getStatus ', idObject)
+  doLog('ggggetStatus ' + str(idObject))
   specs = getEngineSpecs(idObject)
-  doLog(specs)
-  if specs:
-    # prob for status
-    return {'success': True, 'online': True, 'enabled': True, 'data': specs}
-  return {'success': False, 'data': 'No specs'}
+  try: 
+    if specs:
+      # prob for status
+      success, data = make_get_request(specs['endpoint'], '/engine/status')
+      resData = json.loads(data)
+      if success:
+        return {'success': resData['status']['code'] == 200, 'online': resData['data']['engine_status'] == 'Running\n', 'enabled': True, 'data': data}
+      else:
+        return {'success': False, 'data': data }
+    return {'success': False, 'data': 'No specs'}
+  except Exception as e:
+    return {'success': False, 'data': str(e)}
 
 def doStart(idObject):
   doLog('doStart ', idObject)
   specs = getEngineSpecs(idObject)
-  if specs:
-    # send start command
-    return {'success': True, 'online': True, 'enabled': True, 'data': specs}
-  return {'success': False, 'data': 'No specs'}
+  try: 
+    if specs:
+      # prob for status
+      success, data = make_get_request(specs['endpoint'], '/engine/start')
+      resData = json.loads(data)
+      doLog(resData)
+      if success:
+        return {'success': resData['status']['code'] == 200, 'online': resData['data']['status'], 'enabled': True, 'data': data}
+      else:
+        return {'success': False, 'data': data }
+    return {'success': False, 'data': 'No specs'}
+  except Exception as e:
+    doLog('EEEException' + str(e))
+    return {'success': False, 'data': str(e)}
 
 def doStop(idObject):
   doLog('doStop ', idObject)
   specs = getEngineSpecs(idObject)
-  if specs:
-    # send stop command
-    return {'success': True, 'online': True, 'enabled': True, 'data': specs}
-  return {'success': False, 'data': 'No specs'}
+  try: 
+    if specs:
+      # prob for status
+      success, data = make_get_request(specs['endpoint'], '/engine/stop')
+      resData = json.loads(data)
+      doLog(resData)
+      if success:
+        return {'success': resData['status']['code'] == 200, 'online': not resData['data']['status'], 'enabled': True, 'data': data}
+      else:
+        return {'success': False, 'data': data }
+    return {'success': False, 'data': 'No specs'}
+  except Exception as e:
+    doLog('EEEException' + str(e))
+    return {'success': False, 'data': str(e)}
