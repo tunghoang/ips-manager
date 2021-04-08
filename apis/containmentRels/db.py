@@ -56,6 +56,7 @@ def __doList():
     .filter(Containmentrel.idContainmentrel == None)\
     .with_entities(Object).all()
   doLog(res)
+  __db.session().commit()
   return res
   
 def __doNew(instance):
@@ -66,6 +67,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Containmentrel).filter(Containmentrel.idContainmentrel == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -96,8 +98,8 @@ def __doFind(model):
   else:
     return []
   results = queryObj.all()
+  __db.session().commit()
   return list(map(lambda x: {'idContainmentrel':x[0], 'idContainer': x[1], 'idObject': x[2], 'name': x[3], 'description': x[4], 'idEngine': x[5]},results))
-  #return results
 
 
 def listContainmentrels():
@@ -105,6 +107,10 @@ def listContainmentrels():
   try:
     return __doList()
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doList()
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doList()
@@ -131,6 +137,10 @@ def getContainmentrel(id):
   try:
     return __doGet(id)
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doGet(id)
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doGet(id)

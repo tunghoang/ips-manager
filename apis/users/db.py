@@ -14,7 +14,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(User).all()
+  result = __db.session().query(User).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   instance.password = doHash(instance.password)
@@ -25,6 +27,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(User).filter(User.idUser == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -41,6 +44,7 @@ def __doDelete(id):
   return instance
 def __doFind(model):
   results = __db.session().query(User).filter_by(**model).all()
+  __db.session().commit()
   return results
 
 
@@ -49,6 +53,10 @@ def listUsers():
   try:
     return __doList()
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doList()
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doList()
@@ -75,6 +83,10 @@ def getUser(id):
   try:
     return __doGet(id)
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doGet(id)
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doGet(id)

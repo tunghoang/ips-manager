@@ -5,6 +5,7 @@ from werkzeug.exceptions import *
 from sqlalchemy.exc import OperationalError
 from configparser import ConfigParser
 from apis import config
+import os
 
 class DbInstance:
   __instance = None
@@ -17,7 +18,8 @@ class DbInstance:
   @staticmethod
   def getInstance():
     if DbInstance.__instance is None:
-      connStr = config.get('Default', 'connection_string', fallback='mysql+pymysql://root:newpass123@172.17.0.1/ipsman')
+      connStr = os.getenv('DB_URL')
+      connStr = config.get('Default', 'connection_string', fallback='mysql+pymysql://root:newpass123@172.17.0.1/ipsman') if connStr is None else connStr
       print('connect to db: ', connStr)
       DbInstance.__instance = DbInstance(connStr)
     return DbInstance.__instance
