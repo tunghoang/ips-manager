@@ -55,7 +55,9 @@ def __recover():
   __db.newSession()
 
 def __doList():
-  return __db.session().query(Permission).all()
+  result = __db.session().query(Permission).all()
+  __db.session().commit()
+  return result  
   
 def __doNew(instance):
   __db.session().add(instance)
@@ -65,6 +67,7 @@ def __doNew(instance):
 def __doGet(id):
   instance = __db.session().query(Permission).filter(Permission.idPermission == id).scalar()
   doLog("__doGet: {}".format(instance))
+  __db.session().commit()
   return instance
 
 def __doUpdate(id, model):
@@ -81,6 +84,7 @@ def __doDelete(id):
   return instance
 def __doFind(model):
   results = __db.session().query(Permission).filter_by(**model).all()
+  __db.session().commit()
   return results
 
 
@@ -89,6 +93,10 @@ def listPermissions():
   try:
     return __doList()
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doList()
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doList()
@@ -115,6 +123,10 @@ def getPermission(id):
   try:
     return __doGet(id)
   except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doGet(id)
+  except InterfaceError as e:
     doLog(e)
     __recover()
     return __doGet(id)
