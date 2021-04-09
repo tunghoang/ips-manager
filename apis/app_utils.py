@@ -1,12 +1,11 @@
 from hashlib import sha256
 from flask import jsonify
 from jwt import encode, decode
-from apis import config
+from .config_utils import config
 import time
 from functools import wraps
 from http import client
 
-print(config)
 SALT = 'uet-ips-man'
 JWT_SETCRET = config.get('Default', 'JWT_SECRET', fallback='thisissecret')
 
