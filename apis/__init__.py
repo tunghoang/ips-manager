@@ -21,6 +21,8 @@ from .login import create_api as create_login
 api.add_namespace(create_login())
 from .logout import create_api as create_logout
 api.add_namespace(create_logout())
+from .rulepackages import create_api as create_rulepackages
+api.add_namespace(create_rulepackages())
 from .control import create_api as create_control
 api.add_namespace(create_control())
 #from .alerts import botAlertApi
