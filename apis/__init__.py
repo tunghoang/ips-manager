@@ -23,6 +23,8 @@ from .logout import create_api as create_logout
 api.add_namespace(create_logout())
 from .rulepackages import create_api as create_rulepackages
 api.add_namespace(create_rulepackages())
+from .rulepackageObjectRels import create_api as create_rulepackageObjectRels
+api.add_namespace(create_rulepackageObjectRels())
 from .control import create_api as create_control
 api.add_namespace(create_control())
 #from .alerts import botAlertApi

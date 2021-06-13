@@ -276,6 +276,31 @@ namespaces:
     new_api_description: create a new rulepackage for applied
     delete_api: delete an existing rulepackage
     delete_api_description: delete an existing rulepackage
+  - ns_name: rulepackageObjectRels
+    ns_description: rulepackageObjectRels table namespace
+    resource_name: rulepackageObjectRel
+    props:
+      - name: idRulepackageobjectrel
+        type: Integer
+        primary_key: yes
+      - name: idRulepackage
+        type: Integer
+        foreign_key: rulepackage.idRulepackage
+      - name: idObject
+        type: Integer
+        foreign_key: object.idObject
+      - name: errored
+        type: Boolean
+      - name: synced
+        type: Boolean
+      - name: syncedAt
+        type: DateTime
+    list_api: list all rulepackageObjectRels
+    list_api_description: list all rulepackageObjectRel
+    new_api: create new rulepackageObjectRel
+    new_api_description: create new rulepackageObjectRel
+    delete_api: delete rulepackageObjectRel
+    delete_api_description: delete rulepackageObjectRel
   - ns_name: control
     ns_description: node controls
     resource_name: control
