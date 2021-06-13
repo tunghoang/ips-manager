@@ -41,3 +41,9 @@ def init_routes(api, model):
       '''delete object'''
       return deleteObject(id)
     pass
+  @api.route('/ips')
+  class ListIPS(Resource):
+    @api.doc('list all ips objects')
+    def get(self):
+      '''List IPSs'''
+      return listIPSObjects()

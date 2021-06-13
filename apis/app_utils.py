@@ -5,6 +5,7 @@ from .config_utils import config
 import time
 from functools import wraps
 from http import client
+import json
 
 SALT = 'uet-ips-man'
 JWT_SETCRET = config.get('Default', 'JWT_SECRET', fallback='thisissecret')
@@ -62,3 +63,40 @@ def make_get_request(base, path):
     return True, data
   else:
     return False, data
+
+def make_post_request(base, path, payloadObj):
+  doLog('do POST' + str(base) + str(path))
+  conn = client.HTTPConnection(base)
+  doLog("--- base ", payloadObj)
+  conn.request('POST', str(path), body=json.dumps(payloadObj), headers={'Content-Type': 'application/json'})
+  response = conn.getresponse()
+  data = response.read()
+  conn.close()
+  if response.status == 200:
+    return True, data
+  else:
+    return False, data
+def make_put_request(base, path, payloadObj):
+  doLog('do PUT' + str(base) + str(path))
+  conn = client.HTTPConnection(base)
+  doLog("--- base ", payloadObj)
+  conn.request('PUT', str(path), body=json.dumps(payloadObj), headers={'Content-Type': 'application/json'})
+  response = conn.getresponse()
+  data = response.read()
+  conn.close()
+  if response.status == 200:
+    return True, data
+  else:
+    return False, data
+def make_delete_request(base, path):
+  doLog('do DELETE' + str(base) + str(path))
+  conn = client.HTTPConnection(base)
+  conn.request('DELETE', path)
+  response = conn.getresponse()
+  data = response.read()
+  conn.close()
+  if response.status == 200:
+    return True, data
+  else:
+    return False, data
+  

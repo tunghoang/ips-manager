@@ -14,3 +14,11 @@ def create_response_model(api):
     'data': String
   },mask='*');
   return model
+
+def create_ansible_response_model(api):
+  model = api.model('ansibleResponse', {
+    'ok': Boolean,
+    'changed': Boolean,
+    'failed': Boolean
+  }, mask='*');
+  return model

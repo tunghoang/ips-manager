@@ -49,6 +49,16 @@ def __recover():
   __db.newSession()
 
 def __doList():
+  sql = """
+    SELECT t.idEngine, idEnginetype, specs, idObject, name FROM engine t
+    LEFT JOIN object o ON t.idEngine = o.idEngine
+  """
+  params = {}
+  result = __db.session().execute(sql, params).fetchall()
+  __db.session().commit()
+  return list(map(lambda x: {'idEngine':x[0], 'idEnginetype':x[1], 'specs': x[2], 'idObject':x[3], 'name':x[4]},result))
+
+def __doList1():
   result = __db.session().query(Engine).all()
   __db.session().commit()
   return result  

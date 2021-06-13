@@ -4,9 +4,11 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..elasticsearch_utils import delete_index
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
+import json
 __db = DbInstance.getInstance()
 
 
@@ -52,6 +54,12 @@ class Object(__db.Base):
     if ("description" in dictModel) and (dictModel["description"] != None):
       self.description = dictModel["description"]
 
+def __getEngineSpecs(idEngine):
+  results = __db.session().execute('SELECT specs from engine where idEngine=:idEngine', {'idEngine': idEngine}).fetchall()
+  return json.loads(results[0][0])
+def __get_ip_from_specs(specs):
+  return specs['hostname']
+
 def __recover():
   __db.newSession()
 
@@ -78,8 +86,44 @@ def __doUpdate(id, model):
   instance.update(model)
   __db.session().commit()
   return instance
+
+def __stopNode(specs):
+  try: 
+    doLog('__stopNode', True);
+    if specs:
+      success, data = make_get_request(f"{specs['hostname']}:{specs['port']}", '/engine/stop')
+      resData = json.loads(data)
+      doLog(resData)
+      if success:
+        return {
+          'success': resData['status']['code'] == 200, 
+          'online': resData['data']['engine_status'] == 'Running\n', 
+          'enabled': True, 
+          'data': json.dumps(resData['data']['details'])
+        }
+      else:
+        return {'success': False, 'data': data }
+    return {'success': False, 'data': 'No specs'}
+  except Exception as e:
+    doLog('EEEException' + str(e))
+    return {'success': False, 'data': str(e)}
+
 def __doDelete(id):
   instance = getObject(id)
+
+  if instance.idEngine is not None:
+    specs = __getEngineSpecs(instance.idEngine)
+    resData = __stopNode(specs)
+    print(resData)
+    if not resData['success']:
+      raise BadRequest('Cannot stop hostIPS node')
+
+    ip = __get_ip_from_specs(specs)
+    success, data = delete_index(f'metricbeat-{ip}-*')
+    print(success, data)
+    if not success:
+      raise BadRequest('Cannot remove historic data of node')
+
   __db.session().delete(instance)
   __db.session().commit()
   return instance
@@ -167,6 +211,27 @@ def findObject(model):
     doLog(e)
     __recover()
     return __doFind(model)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
+def __doListIPSObjects():
+  sql = '''SELECT
+      o.idObject, o.name, o.description, e.specs, e.idEnginetype
+    FROM object o 
+      INNER JOIN engine as e ON o.idEngine = e.idEngine
+  '''
+  results = __db.session().execute(sql, {}).fetchall()
+  return list(map(lambda x: {'idObject':x[0], 'name':x[1], 'description': x[2], 'specs': x[3], 'idEnginetype': x[4]}, results))
+
+def listIPSObjects():
+  doLog("List all IPS objects")
+  try:
+    return __doListIPSObjects()
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doListIPSObjects()
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e

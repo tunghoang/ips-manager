@@ -7,6 +7,7 @@ from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 from ..objects import Object
+from ..engines import Engine
 
 __db = DbInstance.getInstance()
 
@@ -83,23 +84,25 @@ def __doDelete(id):
   __db.session().commit()
   return instance
 def __doFind(model):
-  queryObj = __db.session().query(
-    Containmentrel.idContainmentrel, 
-    Containmentrel.idContainer, 
-    Containmentrel.idContainee,
-    Object.name,
-    Object.description,
-    Object.idEngine
-  ).filter(
-    Containmentrel.idContainee == Object.idObject
-  )
   if 'idContainer' in model:
-    queryObj = queryObj.filter(Containmentrel.idContainer == model['idContainer'])
+    results = __db.session().execute("""
+      SELECT cm.idContainmentrel, 
+        cm.idContainer, 
+        cm.idContainee, 
+        obj.name, 
+        obj.description, 
+        obj.idEngine,
+        eng.idEnginetype
+      FROM containmentRel as cm
+        INNER JOIN object as obj ON cm.idContainee = obj.idObject
+        LEFT JOIN engine as eng ON obj.idEngine = eng.idEngine
+      WHERE 
+        cm.idContainer = :idContainer
+    """, {'idContainer': model['idContainer']}).fetchall()
+    __db.session().commit()
+    return list(map(lambda x: {'idContainmentrel':x[0], 'idContainer': x[1], 'idObject': x[2], 'name': x[3], 'description': x[4], 'idEngine': x[5], 'idEnginetype': x[6]}, results))
   else:
     return []
-  results = queryObj.all()
-  __db.session().commit()
-  return list(map(lambda x: {'idContainmentrel':x[0], 'idContainer': x[1], 'idObject': x[2], 'name': x[3], 'description': x[4], 'idEngine': x[5]},results))
 
 
 def listContainmentrels():

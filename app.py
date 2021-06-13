@@ -13,9 +13,9 @@ db = DbInstance.getInstance()
 
 app = Flask("ips-manager")
 app.wsgi_app = ProxyFix(app.wsgi_app)
-app.config['SERVER_NAME'] = "localhost:8000"
+app.config['SERVER_NAME'] = os.getenv("SERVER_NAME","localhost:8000")
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SESSION_FILE_DIR'] = '/tmp'
+app.config['SESSION_FILE_DIR'] = '/tmp/ipsman'
 app.secret_key = os.urandom(16)
 api.init_app(app)
 
@@ -28,7 +28,7 @@ def before_request():
   key = key if key is not None else request.headers.get('auth-key')
   jwt = jwt if jwt is not None else request.headers.get('authorization')
 
-  no_auth_routes = ( '/', '/favicon.ico', '/swagger.json' )
+  no_auth_routes = ( '/', '/favicon.ico', '/swagger.json', '/bot_alert/' )
   no_auth_prefixes = ( '/swaggerui', '/login', '/control' )
   #no_auth_prefixes = ( '/' )
 
