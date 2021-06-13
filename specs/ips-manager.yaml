@@ -245,6 +245,37 @@ namespaces:
         type: String
     list_api: do logout
     list_api_description: do logout
+  - ns_name: rulepackages
+    ns_description: rulepackages table namespace
+    resource_name: rulepackage
+    props:
+      - name: idRulepackage
+        type: Integer
+        primary_key: yes
+      - name: idEnginetype
+        type: Integer
+        foreign_key: enginetype.idEnginetype
+      - name: application
+        type: String
+        type_specs: (100)
+      - name: version
+        type: Integer
+      - name: appliedAt 
+        type: DateTime
+      - name: status
+        type: String
+        type_specs: (50)
+    uniques:
+      - keys: 
+        - name: idEnginetype
+        - name: application
+        - name: version
+    list_api: list applied rulepackages
+    list_api_description: list applied rulepackages
+    new_api: create a new rulepackage
+    new_api_description: create a new rulepackage for applied
+    delete_api: delete an existing rulepackage
+    delete_api_description: delete an existing rulepackage
   - ns_name: control
     ns_description: node controls
     resource_name: control
