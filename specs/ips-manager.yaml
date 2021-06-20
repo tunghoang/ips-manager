@@ -301,6 +301,8 @@ namespaces:
     new_api_description: create new rulepackageObjectRel
     delete_api: delete rulepackageObjectRel
     delete_api_description: delete rulepackageObjectRel
+    find_api: find rulepackageObjectRel
+    find_api_description: find rulepackageObjectRel
   - ns_name: control
     ns_description: node controls
     resource_name: control
