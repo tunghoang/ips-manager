@@ -1,6 +1,9 @@
-from flask import request
+from flask import request, current_app
 from flask_restplus import Resource
+from werkzeug.exceptions import *
 from .db import *
+from datetime import datetime
+import os
 
 zipPath = '../ansible/files/zips'
 def init_routes(api, model):
@@ -10,6 +13,7 @@ def init_routes(api, model):
     @api.marshal_list_with(model)
     def get(self):
       '''list applied rulepackages'''
+      print(current_app.root_path)
       return listRulepackages()
     @api.doc('create a new rulepackage', body=model)
     #@api.expect(model)
@@ -17,13 +21,18 @@ def init_routes(api, model):
     def post(self):
       '''create a new rulepackage for applied'''
       payload = request.form.to_dict()
+      payload['appliedAt'] = datetime.now()
+      payload['status'] = 'uploaded'
       zipfile = request.files.get('zipfile')
       print(payload)
-      print(files)
-      fname = f"{zipPath}/ruleset-{payload['application']}-{payload['version']}.zip"
+      print(zipfile)
+      path = f"{zipPath}/{payload['application']}/{payload['version']}"
+      if not os.path.exists(path):
+        os.makedirs(path, 0o755)
+      
+      fname = f"{path}/ruleset-{payload['application']}-{payload['version']}.zip"
       zipfile.save(fname)
-      return {'message': 'hello world'}
-      #return newRulepackage(api.payload)
+      return newRulepackage(payload)
 
   @api.route('/<int:id>')
   class Instance(Resource):
@@ -31,5 +40,8 @@ def init_routes(api, model):
     @api.marshal_with(model)
     def delete(self, id):
       '''delete an existing rulepackage'''
-      return deleteRulepackage(id)
+      try:
+        return deleteRulepackage(id)
+      except Exception as e:
+        raise BadRequest(str(e))
     pass

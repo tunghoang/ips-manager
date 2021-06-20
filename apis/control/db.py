@@ -318,7 +318,7 @@ def queryModSecRules(idObject):
   specs = getEngineSpecs(idObject)
   try: 
     if specs:
-      success, data = make_post_request(f"{specs['hostname']}:{specs['port']}", '/engine/query/modsec-rules', {'webservers': ['apache2']})
+      success, data = make_post_request(f"{specs['hostname']}:{specs['port']}", '/engine/query/rules', {'idEnginetype': 2, 'webservers': ['apache2']})
       print("------------ data -----------");
       print(data)
       print(success)
@@ -333,6 +333,28 @@ def queryModSecRules(idObject):
     traceback.print_exc()
     doLog('EEEException' + str(e))
     return {'success': False, 'data': str(e)}
+
+def queryRules(idObject, idEnginetype):
+  doLog('queryRules' + str(idObject) + ' ' + str(idEnginetype))
+  specs = getEngineSpecs(idObject)
+  try: 
+    if specs:
+      success, data = make_post_request(f"{specs['hostname']}:{specs['port']}", '/engine/query/rules', {'idEnginetype': idEnginetype})
+      print("------------ data -----------");
+      print(data)
+      print(success)
+      resData = json.loads(data)
+      doLog(resData)
+      if success:
+        return {'success': resData['status']['code'] == 200, 'data': resData['data']}
+      else:
+        return {'success': False, 'data': data }
+    return {'success': False, 'data': 'No specs'}
+  except Exception as e:
+    traceback.print_exc()
+    doLog('EEEException' + str(e))
+    return {'success': False, 'data': str(e)}
+
 
 def installRuleset(idObject, webserver, ruleset):
   doLog(f'Install ruleset: {webserver}, {ruleset}' )

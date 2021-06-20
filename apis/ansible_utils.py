@@ -42,11 +42,12 @@ def __result(runner, ip, eventFn=None):
       details.append( eventFn(host_event['event_data']) )
   return {'ok':auIsOk(runner, ip), 'changed':auIsChanged(runner, ip), 'failed': auIsFailed(runner, ip), 'details': details}
 
-def __invokePlaybook(ip, playbook):
+def __invokePlaybook(ip, playbook, extravars = None):
   r = ansible_runner.run(private_data_dir="/home/ubuntu/ansible",
     playbook=playbook,
     finished_callback=cleanHosts,
-    inventory=ip
+    inventory=ip,
+    extravars=extravars
   )
   return __result(r, ip)
 
@@ -71,6 +72,9 @@ def installModSecRules(ip, webserver, ruleset):
 
 def uninstallModSecRules(ip, webserver, ruleset):
   return __invokePlaybook(ip, f'{webserver}/{ruleset}/uninstall.yaml')
+
+def installApplicationRules(ip, application, version):
+  return __invokePlaybook(ip, f'{application}/install.yaml', {'version': version})
 
 def checkStatus(ip):
   return __invokePlaybook(ip, 'check-status.yaml', lambda event_data: {

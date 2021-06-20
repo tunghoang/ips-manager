@@ -103,6 +103,14 @@ def init_routes(api, model):
       '''Query webserver of node with Id'''
       return queryModSecRules(idObject)
 
+  @api.route('/query/rules/<int:idObject>')
+  class QueryRules(Resource):
+    @api.doc("query rules of node")
+    def post(self, idObject):
+      '''Query rules of node with Id'''
+      idEnginetype = api.payload['idEnginetype']
+      return queryRules(idObject, idEnginetype)
+
   @api.route('/ruleset/<int:idObject>')
   class RulesetInstaller(Resource):
     @api.doc("Install ruleset for idObject")

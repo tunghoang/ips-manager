@@ -5,7 +5,9 @@ from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
 from werkzeug.exceptions import *
-from flask import session,request,after_this_request
+from flask import session,request,after_this_request, current_app
+import shutil
+import os
 
 __db = DbInstance.getInstance()
 
@@ -89,8 +91,11 @@ def __doUpdate(id, model):
   return instance
 def __doDelete(id):
   instance = getRulepackage(id)
+  print(current_app.root_path)
+  path = os.path.join(current_app.root_path, '..', f'ansible/files/zips/{instance.application}/{instance.version}')
   __db.session().delete(instance)
   __db.session().commit()
+  shutil.rmtree(path);
   return instance
 def __doFind(model):
   results = __db.session().query(Rulepackage).filter_by(**model).all()
