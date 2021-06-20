@@ -79,6 +79,24 @@ def __doGet(id):
   __db.session().commit()
   return instance
 
+def __doGetDetails(id):
+  sql = """
+SELECT 
+  o.idObject, o.idEngine, o.description, o.name, et.idEnginetype
+FROM object o
+  LEFT JOIN engine e
+    ON o.idEngine = e.idEngine
+  LEFT JOIN enginetype et
+    on e.idEnginetype = et.idEnginetype
+WHERE
+  o.idObject = :idObject
+  """
+  results = __db.session().execute(sql, {'idObject': id}).fetchall()
+  if len(results) == 0 :
+    raise BadRequest('Not found');
+  result = results[0];
+  return {'idObject': result[0], 'idEngine': result[1], 'description': result[2], 'name': result[3], 'idEnginetype': result[4]}
+
 def __doUpdate(id, model):
   instance = getObject(id)
   if instance == None:
@@ -178,6 +196,22 @@ def getObject(id):
   except SQLAlchemyError as e:
     __db.session().rollback()
     raise e
+
+def getObjectDetails(id):
+  try:
+    return __doGetDetails(id)
+  except OperationalError as e:
+    doLog(e)
+    __recover()
+    return __doGetDetails(id)
+  except InterfaceError as e:
+    doLog(e)
+    __recover()
+    return __doGetDetails(id)
+  except SQLAlchemyError as e:
+    __db.session().rollback()
+    raise e
+
 
 def updateObject(id, model):
   doLog("update DAO function. Model: {}".format(model))

@@ -47,3 +47,9 @@ def init_routes(api, model):
     def get(self):
       '''List IPSs'''
       return listIPSObjects()
+  @api.route('/details/<int:id>')
+  class DetailInstance(Resource):
+    @api.doc('get object detail')
+    def get(self, id):
+      '''get Object details'''
+      return getObjectDetails(id)
