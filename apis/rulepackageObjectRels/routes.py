@@ -11,7 +11,6 @@ def init_routes(api, model):
       return listRulepackageobjectrels()
     @api.doc('find rulepackageObjectRel')
     @api.expect(model)
-    @api.marshal_list_with(model)
     def put(self):
       '''find rulepackageObjectRel'''
       return findRulepackageobjectrel(api.payload)
