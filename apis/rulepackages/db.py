@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean, Date, DateTime, Text
+from sqlalchemy import ForeignKey, Column, BigInteger, Integer, Float, String, Boolean, Date, DateTime, Text
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
@@ -16,7 +16,7 @@ class Rulepackage(__db.Base):
   idRulepackage = Column(Integer, primary_key = True)
   idEnginetype = Column(Integer, ForeignKey('enginetype.idEnginetype'))
   application = Column(String(100))
-  version = Column(Integer(20))
+  version = Column(BigInteger)
   appliedAt = Column(DateTime)
   status = Column(String(50))
 

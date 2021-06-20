@@ -259,8 +259,7 @@ namespaces:
         type: String
         type_specs: (100)
       - name: version
-        type: Integer
-        type_specs: (20)
+        type: BigInteger
       - name: appliedAt 
         type: DateTime
       - name: status
