@@ -5,7 +5,7 @@ def create_model(api):
     'idRulepackage': Integer,
     'idEnginetype': Integer,
     'application': String,
-    'version': Integer,
+    'version': BigInteger,
     'appliedAt': DateTime,
     'status': String 
   },mask='*');
