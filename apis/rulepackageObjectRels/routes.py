@@ -9,6 +9,12 @@ def init_routes(api, model):
     def get(self):
       '''list all rulepackageObjectRel'''
       return listRulepackageobjectrels()
+    @api.doc('find rulepackageObjectRel')
+    @api.expect(model)
+    @api.marshal_list_with(model)
+    def put(self):
+      '''find rulepackageObjectRel'''
+      return findRulepackageobjectrel(api.payload)
     @api.doc('create new rulepackageObjectRel', body=model)
     @api.expect(model)
     @api.marshal_with(model)
