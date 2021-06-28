@@ -16,6 +16,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 app.config['SERVER_NAME'] = os.getenv("SERVER_NAME","localhost:8000")
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/tmp/ipsman'
+app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 app.secret_key = os.urandom(16)
 api.init_app(app)
 

@@ -334,6 +334,79 @@ def queryModSecRules(idObject):
     doLog('EEEException' + str(e))
     return {'success': False, 'data': str(e)}
 
+def getVersionInfo(idObject, app):
+  sql = '''
+SELECT
+  rpor.idRulepackageobjectrel, rp.application, rp.version, rpor.synced, rpor.errored
+FROM rulepackageObjectRel rpor
+  INNER JOIN object o
+    ON rpor.idObject = o.idObject
+  INNER JOIN rulepackage rp
+    ON rpor.idRulepackage = rp.idRulepackage
+WHERE
+  rp.application = :application 
+  AND rpor.idObject = :idObject 
+ORDER BY rp.version DESC
+LIMIT 1
+'''
+  results = __db.session().execute(sql, {'application': app, 'idObject': idObject}).fetchall();
+  updateInfo = [None, None,None, None,None ] if len(results) < 1 else results[0]
+
+  sql1 = '''
+SELECT idRulepackage, application, version, appliedAt
+FROM rulepackage rp
+WHERE application = :application
+ORDER BY version DESC
+LIMIT 1
+'''
+  rulepackages = __db.session().execute(sql1, {'application': app}).fetchall();
+  if len(rulepackages) < 1:
+    __db.session().commit()
+    return {}
+  return {'idRulepackage': rulepackages[0][0], 'application': rulepackages[0][1], 'version': rulepackages[0][2], 'availableAt':str(rulepackages[0][3]), 'idRulepackageobjectrel':updateInfo[0], 'appliedMaxVersion':updateInfo[2], 'synced': updateInfo[3], 'errored': updateInfo[4]}
+
+def getVersionInfo1(idObject, app):
+  try:
+    sql = '''
+SELECT idRulepackage, application, version, appliedAt, (
+  SELECT
+    MAX(version) as maxversion
+  FROM rulepackageObjectRel rpor
+    INNER JOIN object o
+      ON rpor.idObject = o.idObject
+    INNER JOIN rulepackage rp
+      ON rpor.idRulepackage = rp.idRulepackage
+  WHERE
+    rp.application = :application 
+  AND rpor.idObject = :idObject 
+  AND rpor.synced is TRUE
+) as maxversion, (
+  SELECT
+    MAX(version) as maxversion
+  FROM rulepackageObjectRel rpor
+    INNER JOIN object o
+      ON rpor.idObject = o.idObject
+    INNER JOIN rulepackage rp
+      ON rpor.idRulepackage = rp.idRulepackage
+  WHERE
+    rp.application = :application 
+  AND rpor.idObject = :idObject 
+  AND rpor.synced is not TRUE AND rpor.errored is NOT TRUE
+) as pendingversion,
+FROM rulepackage rp
+WHERE application = :application
+ORDER BY version DESC
+LIMIT 1
+'''
+    results = __db.session().execute(sql, {'application': app, 'idObject': idObject}).fetchall();
+    __db.session().commit()
+    if len(results) < 1:
+      return {}
+    return {'idRulepackage': results[0][0], 'application': results[0][1], 'version': results[0][2], 'availableAt':str(results[0][3]), 'appliedMaxVersion':results[0][4], 'pendingVersion': results[0][5]}
+  except Exception as e:
+    traceback.print_exc()
+    return {}
+
 def queryRules(idObject, idEnginetype):
   doLog('queryRules' + str(idObject) + ' ' + str(idEnginetype))
   specs = getEngineSpecs(idObject)
@@ -345,8 +418,13 @@ def queryRules(idObject, idEnginetype):
       print(success)
       resData = json.loads(data)
       doLog(resData)
+      appVersions = []
+      for app,variants in resData['data'].items():
+        versionInfo = getVersionInfo(idObject, app)
+        doLog(versionInfo, True)
+        appVersions.append({'application': app, **versionInfo})
       if success:
-        return {'success': resData['status']['code'] == 200, 'data': resData['data']}
+        return {'success': resData['status']['code'] == 200, 'data': appVersions}
       else:
         return {'success': False, 'data': data }
     return {'success': False, 'data': 'No specs'}

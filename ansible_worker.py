@@ -1,3 +1,4 @@
+import traceback
 from apis.db_utils import DbInstance
 import time
 from datetime import datetime
@@ -9,11 +10,16 @@ logging.config.fileConfig(fname='ansible_worker.ini')
 
 logger = logging.getLogger('WORKER_LOGGER')
 
-def updateRulepackageObjectRel(session, idRulepackageobjectrel, synced = True, errored = False):
-  sql = 'UPDATE rulepackageObjectRel SET synced = :synced, errored = :errored'
-  session.execute(sql, {'synced': synced, 'errored': errored})
-
 __db = DbInstance.getInstance()
+
+def updateRulepackageObjectRel(session, idRulepackageobjectrel, synced = True, errored = False):
+  try:
+    sql = 'UPDATE rulepackageObjectRel SET synced = :synced, errored = :errored WHERE idRulepackageobjectrel=:idRulepackageobjectrel'
+    session.execute(sql, {'synced': synced, 'errored': errored, 'idRulepackageobjectrel': idRulepackageobjectrel})
+    session.commit()
+  except Exception as e:
+    traceback.print_exc()
+    session.rollback()
 
 sql_stm = '''
 SELECT 
@@ -27,11 +33,12 @@ FROM object obj
     ON obj.idObject = rporel.idObject
   INNER JOIN rulepackage rp
     ON rporel.idRulepackage = rp.idRulepackage
-WHERE rporel.synced <> 1 AND rp.idEnginetype = en.idEnginetype
+WHERE rporel.synced is NOT TRUE AND rporel.errored is NOT TRUE AND rp.idEnginetype = en.idEnginetype
 '''
 
 while True:
   try:
+    __db.newSession()
     results = __db.session().execute(sql_stm, {}).fetchall();
     if len(results) > 0:
       for r in results:
@@ -42,14 +49,14 @@ while True:
         version = r[6]
         try:
           ret = installApplicationRules(ip, application, version)
+          print(f'RESULT -- {str(ret)}')
           if ret['ok'] and not ret['failed']:
             updateRulepackageObjectRel(__db.session(), r[7], True, False)
           else:
             updateRulepackageObjectRel(__db.session(), r[7], False, True)
-          __db.session().commit()
         except Exception as e:
           raise e
   except Exception as e:
     logger.error(str(e))
     __db.session().rollback()
-  time.sleep(60)
+  time.sleep(30)

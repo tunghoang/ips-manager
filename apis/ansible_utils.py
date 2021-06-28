@@ -74,7 +74,8 @@ def uninstallModSecRules(ip, webserver, ruleset):
   return __invokePlaybook(ip, f'{webserver}/{ruleset}/uninstall.yaml')
 
 def installApplicationRules(ip, application, version):
-  return __invokePlaybook(ip, f'{application}/install.yaml', {'version': version})
+  print(f'INSTALL --{ip}-- --{application}-- --{str(version)}--')
+  return __invokePlaybook(ip, f'rulesets/{application}/install.yaml', {'version': version})
 
 def checkStatus(ip):
   return __invokePlaybook(ip, 'check-status.yaml', lambda event_data: {
