@@ -1,0 +1,14 @@
+[Unit]
+Description=NetIPS agent service
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+User=admin
+WorkingDirectory=/opt/netips/ips-agent
+ExecStart=/usr/bin/node server.js --config net-ips.yaml --port 8000
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  tasks:
+    - name: stop beats
+      systemd:
+        name: "{{item}}"
+        state: stopped
+      loop:
+        - metricbeat
+        - filebeat
+        - filebeat.modsec
+      become: yes

@@ -1,0 +1,21 @@
+- name: host-ips-agent source code
+  synchronize:
+    src: ../ips-agent
+    dest: /home/ubuntu/
+- name: npm install for host-ips-agent
+  command:
+    chdir: /home/ubuntu/ips-agent
+    cmd: npm install
+- name: install host-ips-agent service
+  synchronize:
+    src: ../ips-agent/host-ips-agent.service
+    dest: /etc/systemd/system/
+  become: yes
+- name: start host-ips-agent
+  systemd:
+    daemon_reload: yes
+    name: host-ips-agent
+    enabled: yes
+    state: restarted
+  become: yes
+

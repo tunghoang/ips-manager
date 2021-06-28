@@ -1,0 +1,14 @@
+[Unit]
+Description=HostIPS agent service
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+User=root
+WorkingDirectory=/home/ubuntu/ips-agent
+ExecStart=/usr/bin/node server.js --config host-ips.yaml --port 8000
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,4 @@
+- name: ipsengine
+  status: test `/usr/local/bin/idssystem status` == 'Running'
+  stop: /usr/local/bin/idssystem stop
+  start: /usr/local/bin/idssystem start

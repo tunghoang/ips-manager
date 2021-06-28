@@ -1,0 +1,22 @@
+- name: install base package
+  apt:
+    name:
+      - apt-transport-https
+      - unzip
+      - clamav
+      - nodejs
+      - python3
+      - python3-pip
+    state: present
+    update_cache: yes
+  become: yes
+- name: install npm
+  apt:
+    name: npm
+    state: present
+  become: yes
+  ignore_errors: yes
+- name: set hostname
+  hostname:
+    name: "{{inventory_hostname}}"
+  become: yes

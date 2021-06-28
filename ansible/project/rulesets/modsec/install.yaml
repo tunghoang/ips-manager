@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    assets_base: ../../../files/zips
+    application: modsec
+    install_location: /opt/modsecurity
+  tasks:
+    - name: create install dir
+      file:
+        path: "{{install_location}}"
+        recurse: yes
+        state: directory
+    - name: unarchive
+      unarchive:
+        src: "{{assets_base}}/{{application}}/{{version}}/ruleset-{{application}}-{{version}}.zip"
+        dest: "{{install_location}}/"
+    - name: patch load directive in mods-available/security2.conf
+      lineinfile:
+        create: yes
+        line: "	IncludeOptional {{install_location}}/main.load"
+        state: present
+        insertbefore: ^</IfModule>$
+        path: /etc/apache2/mods-available/security2.conf

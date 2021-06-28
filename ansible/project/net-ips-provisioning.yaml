@@ -1,0 +1,14 @@
+---
+- hosts: all
+  vars:
+    kibana_host: 192.168.0.20
+    kibana_port: 5601
+    elasticsearch_host: 192.168.0.20
+    elasticsearch_port: 9200
+    logstash_host: 192.168.0.20
+    logstash_port: 5044
+  tasks:
+    - name: install base packages
+      include_tasks: tasks/net-base-install.yaml
+    - name: install net-ips-agent
+      include_tasks: tasks/net-ips-agent.yaml

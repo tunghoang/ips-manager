@@ -1,0 +1,24 @@
+- name: install mod_security2
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-security2
+    state: present
+  become: yes
+
+- name: update /etc/modsecurity/modsecurity.conf
+  synchronize: 
+    src: ../modsec-templates/apache2/etc_modsecurity/modsecurity.conf
+    dest: /etc/modsecurity/
+  become: yes
+
+- name: config modsecurity 1
+  template:
+    src: ../modsec-templates/apache2/mods-available/security2.conf
+    dest: /etc/apache2/mods-available/
+  become: yes
+
+- name: enable modsecurity
+  command: a2enmod security2
+  become: yes
+

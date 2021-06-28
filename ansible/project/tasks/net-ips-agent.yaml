@@ -1,0 +1,23 @@
+- name: net-ips-agent source code
+  synchronize:
+    src: ../ips-agent
+    dest: /opt/netips/
+  become: yes
+- name: npm install for net-ips-agent
+  command:
+    chdir: /opt/netips/ips-agent
+    cmd: npm install
+  become: yes
+- name: install net-ips-agent service
+  synchronize:
+    src: ../ips-agent/net-ips-agent.service
+    dest: /etc/systemd/system/
+  become: yes
+- name: start net-ips-agent
+  systemd:
+    daemon_reload: yes
+    name: net-ips-agent
+    enabled: yes
+    state: restarted
+  become: yes
+

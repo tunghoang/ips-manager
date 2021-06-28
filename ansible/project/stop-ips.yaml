@@ -1,0 +1,12 @@
+---
+- hosts: all
+  tasks:
+    - name: stop ips
+      systemd:
+        name: "{{item}}"
+        state: stopped
+      loop:
+        - host-ips-agent
+        - hostIPS
+        - apache2
+      become: yes

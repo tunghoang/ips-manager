@@ -1,0 +1,19 @@
+- name: install base package
+  package:
+    name:
+      - zip
+      - unzip
+      - nodejs
+    state: present
+    update_cache: yes
+  become: yes
+- name: install npm
+  package:
+    name: npm
+    state: present
+  become: yes
+  ignore_errors: yes
+#- name: set hostname
+#  hostname:
+#    name: "{{inventory_hostname}}"
+#  become: yes

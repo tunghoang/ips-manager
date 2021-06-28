@@ -1,0 +1,153 @@
+---
+- hosts: all
+  vars:
+    kibana_host: 192.168.0.20
+    kibana_port: 5601
+    elasticsearch_host: 192.168.0.20
+    elasticsearch_port: 9200
+    logstash_host: 192.168.0.20
+    logstash_port: 5044
+  tasks:
+  - name: install clamav, nodejs
+    apt:
+      name: 
+        - clamav
+        - nodejs
+      state: present
+    become: yes
+  - name: install npm
+    apt:
+      name: npm
+      state: present
+    become: yes
+    ignore_errors: yes
+  - name: host-ips-agent source code
+    synchronize:
+      src: ../files/host-ips-agent
+      dest: /home/ubuntu/
+  - name: npm install for host-ips-agent
+    command:
+      chdir: /home/ubuntu
+      cmd: npm install
+  - name: install host-ips-agent service
+    synchronize:
+      src: ../files/host-ips-agent/host-ips-agent.service
+      dest: /etc/systemd/system/
+    become: yes
+  - name: start host-ips-agent
+    systemd:
+      daemon_reload: yes
+      name: host-ips-agent
+      enabled: yes
+      state: started
+    become: yes
+  - name: HostIPS source code
+    synchronize:
+      src: ../files/API
+      dest: /opt/
+    become: yes
+  - name: install HostIPS service
+    synchronize: 
+      src: ../files/API/hostIPS.service
+      dest: /etc/systemd/system/
+    become: yes
+  - name: set hostname
+    hostname:
+      name: "{{inventory_hostname}}"
+    become: yes
+  - name: install key
+    apt_key:
+      url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      state: present
+    become: yes
+  - name: install prequisites
+    apt:
+      name: apt-transport-https
+      update_cache: yes
+    become: yes
+  - name: install elastic search repo
+    apt_repository:
+      repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+      state: present
+    become: yes
+  - name: install filebeat and metricbeat
+    apt:
+      name: 
+      - filebeat=7.11.1
+      - metricbeat=7.11.1
+    become: yes
+  - name: install configure file for filebeat
+    template:
+      src: "../files/templates/{{item}}.j2"
+      dest: "/etc/filebeat/{{item}}.yml"
+      mode: '0644'
+    loop:
+      - filebeat
+      - filebeat.modsec
+    become: yes
+  - name: prepare path.data and path.log for filebeat.modsec
+    synchronize:
+      src: ../files/empty
+      dest: "{{item}}"
+    loop:
+      - /var/log/filebeat.modsec
+      - /var/lib/filebeat.modsec
+    become: yes
+      
+  - name: install filebeat.modsec service
+    synchronize:
+      src: ../files/templates/filebeat.modsec.service
+      dest: /etc/systemd/system/
+    become: yes
+  - name: install configure file for metricbeat
+    template:
+      src: ../files/templates/metricbeat.j2
+      dest: /etc/metricbeat/metricbeat.yml
+      mode: '0644'
+    become: yes
+
+  - name: intall configure module files for metricbeat
+    synchronize:
+      src: ../files/templates/metricbeat.modules.d/
+      dest: /etc/metricbeat/modules.d/
+    become: yes
+
+  - name: chown of modules config files
+    command: chown root:root -R /etc/metricbeat/modules.d
+    become: yes
+
+  - name: install OWASP core rule set
+    synchronize: 
+      src: ../files/owasp-modsecurity-crs
+      dest: /usr/share/
+    become: yes
+
+  - name: install mod_security2
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-security2
+      state: present
+    become: yes
+
+  - name: config modesecurity
+    synchronize:
+      src: ../files/modsecurity
+      dest: /opt/
+    become: yes
+
+  - name: config modsecurity 1
+    template:
+      src: ../files/modsecurity/security2.conf
+      dest: /etc/apache2/mods-available/
+    become: yes
+
+  - name: enable modsecurity
+    command: a2enmod security2
+    become: yes
+
+  - name: reload systemd
+    systemd: 
+      daemon_reload: yes
+      #name: host-ips-agent
+    become: yes

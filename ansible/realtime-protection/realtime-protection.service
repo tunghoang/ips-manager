@@ -1,0 +1,14 @@
+[Unit]
+Description=HostIPS realtime protection service
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+User=root
+WorkingDirectory=/opt/realtime-protection
+ExecStart=/usr/bin/python3 /opt/realtime-protection/realtime-protection.py
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

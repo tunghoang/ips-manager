@@ -1,0 +1,11 @@
+- name: freshclam.conf
+  template:
+    src: ../clamav-templates/freshclam.conf.j2
+    dest: /etc/clamav/freshclam.conf
+    mode: 444
+  become: yes
+- name: start clamav-freshclam
+  service:
+    name: clamav-freshclam
+    state: started
+  become: yes

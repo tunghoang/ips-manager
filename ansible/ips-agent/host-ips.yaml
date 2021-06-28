@@ -1,0 +1,16 @@
+- name: filebeat
+  status: test `systemctl is-active filebeat` == \'active\'
+  start: systemctl start filebeat
+  stop: systemctl stop filebeat
+- name: filebeat.modsec
+  status: test `systemctl is-active filebeat.modsec` == \'active\'
+  start: systemctl start filebeat.modsec
+  stop: systemctl stop filebeat.modsec
+- name: metricbeat
+  status: test `systemctl is-active metricbeat` == \'active\'
+  start: systemctl start metricbeat
+  stop: systemctl stop metricbeat
+- name: realtime-protection
+  status: test `systemctl is-active realtime-protection` == \'active\'
+  start: systemctl start realtime-protection
+  stop: systemctl stop realtime-protection

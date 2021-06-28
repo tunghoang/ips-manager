@@ -1,0 +1,16 @@
+- name: install key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  become: yes
+- name: install elastic search repo
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+    state: present
+  become: yes
+- name: install filebeat and metricbeat
+  apt:
+    name: 
+    - filebeat=7.11.1
+    - metricbeat=7.11.1
+  become: yes

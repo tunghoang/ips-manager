@@ -1,0 +1,18 @@
+---
+- hosts: all
+  tasks:
+#    - name: check status
+#      service_facts:
+#      register: output
+#    - name: debug
+#      debug:
+#        var: output.ansible_facts.services["host-ips-agent.service"]["state"]
+    - name: check-status
+      systemd:
+        name: "{{item}}"
+        state: status
+      loop:
+        - host-ips-agent
+        - hostIPS
+        - metricbeat
+        - filebeat

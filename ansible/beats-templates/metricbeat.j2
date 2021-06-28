@@ -1,0 +1,36 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+
+setup.template.type: component
+setup.ilm.overwrite: true
+
+setup.dashboards.enabled: false
+
+setup.kibana:
+  #host: "192.168.0.20:5601"
+  host: "{{kibana_host}}:{{kibana_port}}"
+
+output.elasticsearch:
+  enabled: false
+  hosts: ["{{elasticsearch_host}}:{{elasticsearch_port}}"]
+
+output.logstash:
+  enabled: true
+  hosts: ["{{logstash_host}}:{{logstash_port}}"]
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+logging.to_files: true
+
+logging.files:
+  path: /tmp
+  name: metricbeat.log
+  keepfiles: 2
