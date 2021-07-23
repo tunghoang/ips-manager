@@ -1,0 +1,15 @@
+[Unit]
+Description=IPS Manager service
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+User=root
+WorkingDirectory=/opt/ips-manager
+Environment="SERVER_NAME=hostips.duckdns.org:8000"
+ExecStart=/opt/venv/bin/gunicorn --pythonpath=/opt/venv/lib/python3.8/site-packages --config gconfig.py app:app
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

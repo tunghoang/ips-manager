@@ -13,7 +13,9 @@ db = DbInstance.getInstance()
 
 app = Flask("ips-manager")
 app.wsgi_app = ProxyFix(app.wsgi_app)
-app.config['SERVER_NAME'] = os.getenv("SERVER_NAME","localhost:8000")
+server_name = os.getenv("SERVER_NAME","localhost:8000")
+print(server_name)
+app.config['SERVER_NAME'] = server_name
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/tmp/ipsman'
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024

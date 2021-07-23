@@ -1,6 +1,7 @@
 import ansible_runner
 import os, sys
 import json
+from .config_utils import config
 from getopt import getopt, GetoptError
 
 def auIsOk(runner, ip):
@@ -16,21 +17,10 @@ def auIsFailed(runner, ip):
 def auOutput(runner, ip):
   return runner.stdout.read()
 
-def sourcecodeHostIPSAgent(ip):
-  return ansible_runner.run(private_data_dir="/home/ubuntu/ansible", 
-    module="synchronize", 
-    module_args="src='files/host-ips-agent' dest='/home/ubuntu/'",
-    host_pattern=ip
-  )
-def installHostIPSAgentService(ip):
-  return ansible_runner.run(private_data_dir="/home/ubuntu/ansible",
-    module="synchronize",
-    module_args="src='files/host-ips-agent/host-ips-agent.service' dest='/etc/systemd/system/'",
-    host_pattern=ip
-  )
+ansibleRoot = config.get("Default", "ansible_root", fallback="")
 
 def cleanHosts(arg):
-  os.remove("/home/ubuntu/ansible/inventory/hosts")
+  os.remove(f"{ansibleRoot}/inventory/hosts")
 
 def __result(runner, ip, eventFn=None):
   if eventFn is None:
@@ -43,7 +33,7 @@ def __result(runner, ip, eventFn=None):
   return {'ok':auIsOk(runner, ip), 'changed':auIsChanged(runner, ip), 'failed': auIsFailed(runner, ip), 'details': details}
 
 def __invokePlaybook(ip, playbook, extravars = None):
-  r = ansible_runner.run(private_data_dir="/home/ubuntu/ansible",
+  r = ansible_runner.run(private_data_dir=ansibleRoot,
     playbook=playbook,
     finished_callback=cleanHosts,
     inventory=ip,

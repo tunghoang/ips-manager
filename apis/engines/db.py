@@ -3,12 +3,14 @@ from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
+from ..config_utils import config
+from ..portability import quote
 from ..app_utils import *
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 
 __db = DbInstance.getInstance()
-
+dialect = config.get('Default', 'dialect', fallback = "")
 
 
 class Engine(__db.Base):
@@ -50,9 +52,10 @@ def __recover():
 
 def __doList():
   sql = """
-    SELECT t.idEngine, idEnginetype, specs, idObject, name FROM engine t
-    LEFT JOIN object o ON t.idEngine = o.idEngine
+    SELECT t.#idEngine#, #idEnginetype#, #specs#, #idObject#, #name# FROM #engine# t
+    LEFT JOIN #object# o ON t.#idEngine# = o.#idEngine#
   """
+  sql = quote(sql, dialect)
   params = {}
   result = __db.session().execute(sql, params).fetchall()
   __db.session().commit()

@@ -114,9 +114,14 @@ def deleteUser(id):
     doLog(e)
     __recover()
     return __doDelete(id)
+  except IntegrityError as e:
+    __db.session().rollback()
+    raise BadRequest("Cannot delete user")
   except SQLAlchemyError as e:
     __db.session().rollback()
-    raise e
+    raise BadRequest(str(e))
+  except Exception as e:
+    raise BadRequest(str(e))
 
 def findUser(model):
   doLog("find DAO function %s" % model)

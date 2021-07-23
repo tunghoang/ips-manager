@@ -1,12 +1,12 @@
 - name: install configure file for metricbeat
   template:
-    src: ../beat-templates/metricbeat.j2
+    src: ../beats-templates/metricbeat.j2
     dest: /etc/metricbeat/metricbeat.yml
     mode: '0644'
   become: yes
 - name: intall configure module files for metricbeat
   synchronize:
-    src: ../beat-templates/metricbeat.modules.d/
+    src: ../beats-templates/metricbeat.modules.d/
     dest: /etc/metricbeat/modules.d/
   become: yes
 - name: chown of modules config files
@@ -15,7 +15,7 @@
 
 - name: install configure file for filebeat
   template:
-    src: "../beat-templates/{{item}}.j2"
+    src: "../beats-templates/{{item}}.j2"
     dest: "/etc/filebeat/{{item}}.yml"
     mode: '0644'
   loop:
@@ -24,7 +24,7 @@
   become: yes
 - name: prepare path.data and path.log for filebeat.modsec
   synchronize:
-    src: ../beat-templates/empty
+    src: ../beats-templates/empty
     dest: "{{item}}"
   loop:
     - /var/log/filebeat.modsec
@@ -32,6 +32,6 @@
   become: yes
 - name: install filebeat.modsec service
   synchronize:
-    src: ../beat-templates/filebeat.modsec.service
+    src: ../beats-templates/filebeat.modsec.service
     dest: /etc/systemd/system/
   become: yes

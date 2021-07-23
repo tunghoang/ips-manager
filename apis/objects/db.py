@@ -4,14 +4,16 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..portability import quote
 from ..elasticsearch_utils import delete_index
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
+from ..config_utils import config
 
 import json
 __db = DbInstance.getInstance()
 
-
+dialect = config.get('Default', 'dialect', fallback="")
 
 class Object(__db.Base):
   __tablename__ = "object"
@@ -55,7 +57,9 @@ class Object(__db.Base):
       self.description = dictModel["description"]
 
 def __getEngineSpecs(idEngine):
-  results = __db.session().execute('SELECT specs from engine where idEngine=:idEngine', {'idEngine': idEngine}).fetchall()
+  sql = 'SELECT #specs# from engine where #idEngine#=:idEngine'
+  sql = quote(sql, dialect)
+  results = __db.session().execute(sql, {'idEngine': idEngine}).fetchall()
   return json.loads(results[0][0])
 def __get_ip_from_specs(specs):
   return specs['hostname']
@@ -82,15 +86,16 @@ def __doGet(id):
 def __doGetDetails(id):
   sql = """
 SELECT 
-  o.idObject, o.idEngine, o.description, o.name, et.idEnginetype
-FROM object o
+  o.#idObject#, o.#idEngine#, o.description, o.name, et.#idEnginetype#
+FROM #object# o
   LEFT JOIN engine e
-    ON o.idEngine = e.idEngine
+    ON o.#idEngine# = e.#idEngine#
   LEFT JOIN enginetype et
-    on e.idEnginetype = et.idEnginetype
+    on e.#idEnginetype# = et.#idEnginetype#
 WHERE
-  o.idObject = :idObject
+  o.#idObject# = :idObject
   """
+  sql = quote(sql, dialect)
   results = __db.session().execute(sql, {'idObject': id}).fetchall()
   if len(results) == 0 :
     raise BadRequest('Not found');
@@ -251,10 +256,11 @@ def findObject(model):
 
 def __doListIPSObjects():
   sql = '''SELECT
-      o.idObject, o.name, o.description, e.specs, e.idEnginetype
+      o.#idObject#, o.name, o.description, e.specs, e.#idEnginetype#
     FROM object o 
-      INNER JOIN engine as e ON o.idEngine = e.idEngine
+      INNER JOIN engine as e ON o.#idEngine# = e.#idEngine#
   '''
+  sql = quote(sql, dialect)
   results = __db.session().execute(sql, {}).fetchall()
   return list(map(lambda x: {'idObject':x[0], 'name':x[1], 'description': x[2], 'specs': x[3], 'idEnginetype': x[4]}, results))
 

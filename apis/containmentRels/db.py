@@ -4,13 +4,15 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..config_utils import config
+from ..portability import quote
 from werkzeug.exceptions import *
 from flask import session,request,after_this_request
 from ..objects import Object
 from ..engines import Engine
 
 __db = DbInstance.getInstance()
-
+dialect = config.get('Default', 'dialect', fallback = "")
 
 
 class Containmentrel(__db.Base):
@@ -85,20 +87,22 @@ def __doDelete(id):
   return instance
 def __doFind(model):
   if 'idContainer' in model:
-    results = __db.session().execute("""
-      SELECT cm.idContainmentrel, 
-        cm.idContainer, 
-        cm.idContainee, 
+    sql = """
+      SELECT cm.#idContainmentrel#, 
+        cm.#idContainer#, 
+        cm.#idContainee#, 
         obj.name, 
         obj.description, 
-        obj.idEngine,
-        eng.idEnginetype
-      FROM containmentRel as cm
-        INNER JOIN object as obj ON cm.idContainee = obj.idObject
-        LEFT JOIN engine as eng ON obj.idEngine = eng.idEngine
+        obj.#idEngine#,
+        eng.#idEnginetype#
+      FROM #containmentRel# as cm
+        INNER JOIN #object# as obj ON cm.#idContainee# = obj.#idObject#
+        LEFT JOIN engine as eng ON obj.#idEngine# = eng.#idEngine#
       WHERE 
-        cm.idContainer = :idContainer
-    """, {'idContainer': model['idContainer']}).fetchall()
+        cm.#idContainer# = :idContainer
+    """
+    sql = quote(sql, dialect)
+    results = __db.session().execute(sql, {'idContainer': model['idContainer']}).fetchall()
     __db.session().commit()
     return list(map(lambda x: {'idContainmentrel':x[0], 'idContainer': x[1], 'idObject': x[2], 'name': x[3], 'description': x[4], 'idEngine': x[5], 'idEnginetype': x[6]}, results))
   else:

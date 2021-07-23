@@ -5,6 +5,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import *
 from ..db_utils import DbInstance
 from ..app_utils import *
+from ..config_utils import config
+from ..portability import quote
 from ..db_helper import getEngineSpecs
 
 from werkzeug.exceptions import *
@@ -15,7 +17,7 @@ import json
 from ..ansible_utils import provision,stopBeats,startBeats,stopIPS,startIPS, installModSecRules, uninstallModSecRules
 
 __db = DbInstance.getInstance()
-
+dialect = config.get('Default', 'dialect', fallback = "")
 
 class Control:
   dummy = Column(Integer)
@@ -337,28 +339,30 @@ def queryModSecRules(idObject):
 def getVersionInfo(idObject, app):
   sql = '''
 SELECT
-  rpor.idRulepackageobjectrel, rp.application, rp.version, rpor.synced, rpor.errored
-FROM rulepackageObjectRel rpor
+  rpor.#idRulepackageobjectrel#, rp.application, rp.version, rpor.synced, rpor.errored
+FROM #rulepackageObjectRel# rpor
   INNER JOIN object o
-    ON rpor.idObject = o.idObject
+    ON rpor.#idObject# = o.#idObject#
   INNER JOIN rulepackage rp
-    ON rpor.idRulepackage = rp.idRulepackage
+    ON rpor.#idRulepackage# = rp.#idRulepackage#
 WHERE
   rp.application = :application 
-  AND rpor.idObject = :idObject 
+  AND rpor.#idObject# = :idObject 
 ORDER BY rp.version DESC
 LIMIT 1
 '''
+  sql = quote(sql, dialect)
   results = __db.session().execute(sql, {'application': app, 'idObject': idObject}).fetchall();
   updateInfo = [None, None,None, None,None ] if len(results) < 1 else results[0]
 
   sql1 = '''
-SELECT idRulepackage, application, version, appliedAt
+SELECT #idRulepackage#, application, version, #appliedAt#
 FROM rulepackage rp
 WHERE application = :application
 ORDER BY version DESC
 LIMIT 1
 '''
+  sql1 = quote(sql1, dialect)
   rulepackages = __db.session().execute(sql1, {'application': app}).fetchall();
   if len(rulepackages) < 1:
     __db.session().commit()
@@ -368,29 +372,29 @@ LIMIT 1
 def getVersionInfo1(idObject, app):
   try:
     sql = '''
-SELECT idRulepackage, application, version, appliedAt, (
+SELECT #idRulepackage#, application, version, #appliedAt#, (
   SELECT
     MAX(version) as maxversion
-  FROM rulepackageObjectRel rpor
+  FROM #rulepackageObjectRel# rpor
     INNER JOIN object o
-      ON rpor.idObject = o.idObject
+      ON rpor.#idObject# = o.#idObject#
     INNER JOIN rulepackage rp
-      ON rpor.idRulepackage = rp.idRulepackage
+      ON rpor.#idRulepackage# = rp.#idRulepackage#
   WHERE
     rp.application = :application 
-  AND rpor.idObject = :idObject 
+  AND rpor.#idObject# = :idObject 
   AND rpor.synced is TRUE
 ) as maxversion, (
   SELECT
     MAX(version) as maxversion
-  FROM rulepackageObjectRel rpor
+  FROM #rulepackageObjectRel# rpor
     INNER JOIN object o
-      ON rpor.idObject = o.idObject
+      ON rpor.#idObject# = o.#idObject#
     INNER JOIN rulepackage rp
-      ON rpor.idRulepackage = rp.idRulepackage
+      ON rpor.#idRulepackage# = rp.#idRulepackage#
   WHERE
     rp.application = :application 
-  AND rpor.idObject = :idObject 
+  AND rpor.#idObject# = :idObject 
   AND rpor.synced is not TRUE AND rpor.errored is NOT TRUE
 ) as pendingversion,
 FROM rulepackage rp
@@ -398,6 +402,7 @@ WHERE application = :application
 ORDER BY version DESC
 LIMIT 1
 '''
+    sql = quote(sql, dialect)
     results = __db.session().execute(sql, {'application': app, 'idObject': idObject}).fetchall();
     __db.session().commit()
     if len(results) < 1:
