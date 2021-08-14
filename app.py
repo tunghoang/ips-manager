@@ -18,7 +18,7 @@ print(server_name)
 app.config['SERVER_NAME'] = server_name
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/tmp/ipsman'
-app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 750 * 1024 * 1024
 app.secret_key = os.urandom(16)
 api.init_app(app)
 

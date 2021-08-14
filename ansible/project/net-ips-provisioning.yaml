@@ -8,7 +8,7 @@
     logstash_host: 192.168.0.20
     logstash_port: 5044
   tasks:
-    - name: install base packages
-      include_tasks: tasks/net-base-install.yaml
+    #- name: install base packages
+    #  include_tasks: tasks/net-base-install.yaml
     - name: install net-ips-agent
       include_tasks: tasks/net-ips-agent.yaml

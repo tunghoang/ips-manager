@@ -3,9 +3,11 @@
   become: yes
   vars:
     assets_base: ../../../files/zips
-    application: idsapi
-    install_location: /opt/netips/addata
-    update_cmd: /usr/local/bin/updatead
+    application: deepinspect
+    #install_location: /opt/netips/addata
+    install_location: /opt/netips/deepinspect/models
+    #update_cmd: /usr/local/bin/updatead
+    update_cmd: /usr/local/bin/updatepm
   tasks:
     - name: create install dir
       file:
@@ -18,5 +20,5 @@
         dest: "{{install_location}}/"
     - name: run update command 
       shell:
-        cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.zip {{version}}"
+        cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.zip enable {{version}}"
         chdir: "{{install_location}}"

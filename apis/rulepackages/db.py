@@ -92,7 +92,7 @@ def __doUpdate(id, model):
 def __doDelete(id):
   instance = getRulepackage(id)
   print(current_app.root_path)
-  path = os.path.join(current_app.root_path, '..', f'ansible/files/zips/{instance.application}/{instance.version}')
+  path = os.path.join(current_app.root_path, f'files/zips/{instance.application}/{instance.version}')
   __db.session().delete(instance)
   __db.session().commit()
   shutil.rmtree(path);

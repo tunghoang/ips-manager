@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    assets_base: ../../../files/zips
+    application: virtualpatching
+    install_location: /opt/netips/rules/update/vp
+    file_ext: sql
+    update_cmd: /usr/local/bin/vpupdate
+  tasks:
+    - name: create install dir
+      file:
+        path: "{{install_location}}"
+        recurse: yes
+        state: directory
+    - name: copy file
+      synchronize:
+        src: "{{assets_base}}/{{application}}/{{version}}/ruleset-{{application}}-{{version}}.{{file_ext}}"
+        dest: "{{install_location}}/"
+    - name: run update command 
+      shell:
+        cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.{{file_ext}} {{version}}"
+        chdir: "{{install_location}}"

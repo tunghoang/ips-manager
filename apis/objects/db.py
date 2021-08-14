@@ -142,10 +142,22 @@ def __doDelete(id):
       raise BadRequest('Cannot stop hostIPS node')
 
     ip = __get_ip_from_specs(specs)
-    success, data = delete_index(f'metricbeat-{ip}-*')
+    success, data = delete_index(f'metricbeat-7.11-{ip}-*')
     print(success, data)
     if not success:
       raise BadRequest('Cannot remove historic data of node')
+    
+    try:
+      sql = '''DELETE
+        FROM #rulepackageObjectRel# rpor
+        WHERE rpor.#idObject# = :idObject
+      '''
+      sql = quote(sql, dialect)
+      __db.session().execute(sql, {'idObject': id})
+      __db.session().commit()
+    except Exception as e:
+      __db.session().rollback()
+      raise BadRequest(str(e))
 
   __db.session().delete(instance)
   __db.session().commit()

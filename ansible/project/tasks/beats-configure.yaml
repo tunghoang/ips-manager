@@ -8,6 +8,7 @@
   synchronize:
     src: ../beats-templates/metricbeat.modules.d/
     dest: /etc/metricbeat/modules.d/
+    perms: yes
   become: yes
 - name: chown of modules config files
   command: chown root:root -R /etc/metricbeat/modules.d
@@ -25,11 +26,16 @@
 - name: prepare path.data and path.log for filebeat.modsec
   synchronize:
     src: ../beats-templates/empty
-    dest: "{{item}}"
-  loop:
-    - /var/log/filebeat.modsec
-    - /var/lib/filebeat.modsec
+    dest: /var/log/filebeat.modsec
   become: yes
+- name: prepare path.data for filebeat.modsec
+  file:
+    path: "{{item}}"
+    state: directory
+  become: yes
+  loop:
+    - /var/lib/filebeat.modsec
+    - /var/log/modsec
 - name: install filebeat.modsec service
   synchronize:
     src: ../beats-templates/filebeat.modsec.service

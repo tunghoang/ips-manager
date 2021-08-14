@@ -21,9 +21,15 @@ function isServiceInstalled(service) {
     case 'idssystem':
       return forkChild('test -x /usr/local/bin/idssystem');
     case 'modsec':
+    case 'blacklisting':
+    case 'virtualpatching':
+    case 'malwarebehavior':
+    case 'anomalymodel':
       return new Promise(resolve => {
         resolve(true);
       });
+    case 'deepinspect':
+      return forkChild('systemctl cat idsapi');
     default:
       return forkChild('systemctl cat ' + service);
     }

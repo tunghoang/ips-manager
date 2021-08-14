@@ -5,7 +5,6 @@ from .db import *
 from datetime import datetime
 import os
 
-zipPath = '../ansible/files/zips'
 def init_routes(api, model):
   @api.route('/')
   class ListInstances(Resource):
@@ -13,7 +12,9 @@ def init_routes(api, model):
     @api.marshal_list_with(model)
     def get(self):
       '''list applied rulepackages'''
+      zipPath = os.path.join(current_app.root_path, 'files/zips')
       print(current_app.root_path)
+      print(f'zipPath: {zipPath}')
       return listRulepackages()
     @api.doc('create a new rulepackage', body=model)
     #@api.expect(model)
@@ -23,15 +24,16 @@ def init_routes(api, model):
       payload = request.form.to_dict()
       payload['appliedAt'] = datetime.now()
       payload['status'] = 'uploaded'
-      zipfile = request.files.get('zipfile')
+      datafile = request.files.get('datafile')
       print(payload)
-      print(zipfile)
+      print(datafile)
+      zipPath = os.path.join(current_app.root_path, 'files/zips')
       path = f"{zipPath}/{payload['application']}/{payload['version']}"
       if not os.path.exists(path):
         os.makedirs(path, 0o755)
       
-      fname = f"{path}/ruleset-{payload['application']}-{payload['version']}.zip"
-      zipfile.save(fname)
+      fname = f"{path}/ruleset-{payload['application']}-{payload['version']}.{payload['fileExt']}"
+      datafile.save(fname)
       return newRulepackage(payload)
 
   @api.route('/<int:id>')

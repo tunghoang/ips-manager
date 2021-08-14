@@ -2,7 +2,7 @@
 - hosts: all
   become: yes
   vars:
-    assets_base: ../../../files/zips
+    assets_base: /opt/ips-manager/files/zips
     application: modsec
     install_location: /opt/modsecurity
   tasks:

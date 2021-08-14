@@ -45,6 +45,12 @@ def provision(ip):
   #return __invokePlaybook(ip, 'pb.yaml')
   return __invokePlaybook(ip, 'provisioning.yaml')
 
+def hostIpsProvision(ip):
+  return __invokePlaybook(ip, 'host-ips-provisioning.yaml')
+
+def netIpsProvision(ip):
+  return __invokePlaybook(ip, 'net-ips-provisioning.yaml')
+
 def stopBeats(ip):
   return __invokePlaybook(ip, 'stop-beats.yaml')
 
@@ -73,6 +79,9 @@ def checkStatus(ip):
     'name': event_data['res']['name'], 
     'state': event_data['res']['state']
   })
+
+def ping(ip):
+  return __invokePlaybook(ip, 'ping.yaml')
 
 if __name__ == "__main__":
   ip = '192.168.0.45'

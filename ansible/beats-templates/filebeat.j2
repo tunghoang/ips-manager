@@ -30,6 +30,7 @@ output.logstash:
   enabled: true
   #hosts: ["192.168.0.20:5044"]
   hosts: ["{{logstash_host}}:{{logstash_port}}"]
+output.logstash.index: "filebeat-7.11-{{inventory_hostname}}"
 
 processors:
   - add_host_metadata:

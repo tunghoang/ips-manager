@@ -123,7 +123,7 @@ app.post('/engine/query/modsec-rules', function(req, res) {
 });
 
 const HOSTIPS_APPS = ['modsec'];
-const NETIPS_APPS = ['idssystem', 'idsapi'];
+const NETIPS_APPS = ['idssystem', 'deepinspect', 'anomalymodel', 'blacklisting', 'virtualpatching', 'malwarebehavior'];
 app.post('/engine/query/rules', function(req, res) {
     let idEnginetype = req.body.idEnginetype;
     switch (idEnginetype) {

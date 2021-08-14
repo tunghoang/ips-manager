@@ -21,6 +21,7 @@ output.elasticsearch:
 output.logstash:
   enabled: true
   hosts: ["{{logstash_host}}:{{logstash_port}}"]
+output.logstash.index: "metricbeat-7.11-{{inventory_hostname}}"
 
 processors:
   - add_host_metadata: ~

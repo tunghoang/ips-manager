@@ -13,3 +13,13 @@
     src: ../realtime-protection/realtime-protection.service
     dest: /etc/systemd/system/
   become: yes
+- name: create directories for monitoring
+  file: 
+    path: "{{item}}"
+    state: directory
+  loop:
+    - /var/www/html/upload
+    - /var/www/html/upload1
+    - /var/www/html/upload2
+    - /var/www/html/upload3
+  become: yes

@@ -7,6 +7,7 @@ Wants=network-online.target systemd-networkd-wait-online.service
 User=root
 WorkingDirectory=/opt/ips-manager
 Environment="SERVER_NAME=hostips.duckdns.org:8000"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/venv/bin"
 ExecStart=/opt/venv/bin/gunicorn --pythonpath=/opt/venv/lib/python3.8/site-packages --config gconfig.py app:app
 Restart=always
 RestartSec=5s

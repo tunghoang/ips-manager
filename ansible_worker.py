@@ -44,6 +44,7 @@ sql_stm = quote(sql_stm, dialect)
 while True:
   try:
     __db.newSession()
+    logger.info('spawn new sesssion to db');
     results = __db.session().execute(sql_stm, {}).fetchall();
     if len(results) > 0:
       for r in results:
