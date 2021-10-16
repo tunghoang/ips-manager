@@ -29,3 +29,5 @@ from .control import create_api as create_control
 api.add_namespace(create_control())
 #from .alerts import botAlertApi
 #api.add_namespace(botAlertApi)
+from .ipssettings import create_api as create_ipssettings
+api.add_namespace(create_ipssettings())
