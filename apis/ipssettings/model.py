@@ -3,6 +3,7 @@ from flask_restplus.fields import Integer, Float, String, String as Text, Date, 
 def create_model(api):
   model = api.model('settings', {
     'param': String,
-    'value': String 
+    'value': String,
+    'category': String 
   },mask='*');
   return model

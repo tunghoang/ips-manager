@@ -318,13 +318,17 @@ namespaces:
     props:
       - name: param
         type: String
-        type_specs: (50)
+        type_specs: (150)
       - name: value
         type: String
         type_specs: (512)
+      - name: category
+        type: String
+        type_specs: (150)
     uniques:
       - keys:
         - name: param
+        - name: category
     find_api: find setting param
     find_api_description: find setting param
     update_api: update setting param

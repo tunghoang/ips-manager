@@ -13,11 +13,12 @@ __db = DbInstance.getInstance()
 
 class Settings(__db.Base):
   __tablename__ = "settings"
-  param = Column(String(50))
+  param = Column(String(150))
   value = Column(String(512))
+  category = Column(String(150))
 
   constraints = list()
-  constraints.append(UniqueConstraint('param'))
+  constraints.append(UniqueConstraint('param','category'))
   if len(constraints) > 0:
     __table_args__ = tuple(constraints)
  
@@ -26,13 +27,15 @@ class Settings(__db.Base):
       self.param = dictModel["param"]
     if ("value" in dictModel) and (dictModel["value"] != None):
       self.value = dictModel["value"]
+    if ("category" in dictModel) and (dictModel["category"] != None):
+      self.category = dictModel["category"]
 
   def __repr__(self):
-    return '<Settings param={} value={} >'.format(self.param, self.value, )
+    return '<Settings param={} value={} category={} >'.format(self.param, self.value, self.category, )
 
   def json(self):
     return {
-      "param":self.param,"value":self.value,
+      "param":self.param,"value":self.value,"category":self.category,
     }
 
   def update(self, dictModel):
@@ -40,6 +43,8 @@ class Settings(__db.Base):
       self.param = dictModel["param"]
     if ("value" in dictModel) and (dictModel["value"] != None):
       self.value = dictModel["value"]
+    if ("category" in dictModel) and (dictModel["category"] != None):
+      self.category = dictModel["category"]
 
 def __recover():
   __db.newSession()
