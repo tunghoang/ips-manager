@@ -5,6 +5,7 @@
     assets_base: ../../../files/zips
     application: idsapi
     install_location: /opt/netips/addata
+    file_ext: dat
     update_cmd: /usr/local/bin/updatead
     # update_cmd: /usr/local/bin/adupdatemgt
   tasks:
@@ -13,11 +14,11 @@
         path: "{{install_location}}"
         recurse: yes
         state: directory
-    - name: copy zip file
+    - name: copy file
       synchronize:
-        src: "{{assets_base}}/{{application}}/{{version}}/ruleset-{{application}}-{{version}}.zip"
+        src: "{{assets_base}}/{{application}}/{{version}}/ruleset-{{application}}-{{version}}.{{file_ext}}"
         dest: "{{install_location}}/"
     - name: run update command 
       shell:
-        cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.zip enable {{version}}"
+        cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.{{file_ext}} {{version}} Applied"
         chdir: "{{install_location}}"

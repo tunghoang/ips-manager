@@ -1,0 +1,41 @@
+es_host: 192.168.0.139
+es_port: 81
+index: modsec-*
+name: modsec-alert
+
+type: frequency
+timeframe:
+  minutes: 1
+num_events: 1
+
+realert:
+  minutes: 1
+
+filter: 
+  - query:
+      query_string:
+        query: "severity:CRITICAL OR severity:ERROR"
+
+alert_subject: "HostIPS ModSec <{}{}>"
+alert_subject_args:
+  - agent.hostname
+  - uri
+
+alert_text: |-
+  Attacks on {} is detected. The atacker looks like: 
+  IP={}, attacked app={}
+  Message={}
+alert_text_args:
+  - agent.hostname
+  - client_ip
+  - uri
+  - modsec.msg
+
+alert_text_type: alert_text_only
+
+alert: 
+  - "telegram"
+
+telegram:
+telegram_bot_token: 1706603337:AAHdHyxdKM3WVz4moHf8aAGIMG_KGFhtATw
+telegram_room_id: "-419531079"

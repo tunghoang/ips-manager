@@ -5,9 +5,9 @@
     assets_base: ../../../files/zips
     application: deepinspect
     #install_location: /opt/netips/addata
-    install_location: /opt/netips/deepinspect/models
+    install_location: /opt/netips/deepinspector/models
     #update_cmd: /usr/local/bin/updatead
-    update_cmd: /usr/local/bin/updatepm
+    #update_cmd: /usr/local/bin/updatepm
   tasks:
     - name: create install dir
       file:
@@ -17,8 +17,12 @@
     - name: copy zip file
       synchronize:
         src: "{{assets_base}}/{{application}}/{{version}}/ruleset-{{application}}-{{version}}.zip"
-        dest: "{{install_location}}/"
-    - name: run update command 
-      shell:
-        cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.zip enable {{version}}"
-        chdir: "{{install_location}}"
+        dest: "{{install_location}}/DLID"
+    #- name: run update command 
+    #  shell:
+    #    cmd: "{{update_cmd}} ruleset-{{application}}-{{version}}.zip enable {{version}}"
+    #    chdir: "{{install_location}}"
+    - name: restart deepinspector service
+      service:
+        name: deepinspector
+        state: restart

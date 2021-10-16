@@ -1,0 +1,17 @@
+[Unit]
+Description=IPS Manager Alerter
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+[Service]
+User=root
+WorkingDirectory=/opt/ips-manager/elastalert
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/venv/bin"
+Environment="PYTHONPATH=/opt/venv/lib/python3.8/site-packages"
+ExecStart=/opt/venv/bin/elastalert --config config.yaml
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+
