@@ -312,3 +312,20 @@ namespaces:
         type: Integer
     list_api: dummy api
     list_api_description: dummy
+  - ns_name: ipssettings
+    ns_description: ips settings
+    resource_name: settings
+    props:
+      - name: param
+        type: String
+        type_specs: (50)
+      - name: value
+        type: String
+        type_specs: (512)
+    uniques:
+      - keys:
+        - name: param
+    find_api: find setting param
+    find_api_description: find setting param
+    update_api: update setting param
+    update_api_description: update setting params

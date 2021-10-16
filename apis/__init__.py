@@ -27,3 +27,5 @@ from .rulepackageObjectRels import create_api as create_rulepackageObjectRels
 api.add_namespace(create_rulepackageObjectRels())
 from .control import create_api as create_control
 api.add_namespace(create_control())
+from .ipssettings import create_api as create_ipssettings
+api.add_namespace(create_ipssettings())
