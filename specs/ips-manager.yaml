@@ -316,6 +316,9 @@ namespaces:
     ns_description: ips settings
     resource_name: settings
     props:
+      - name: idSetting
+        type: Integer
+        primary_key: true
       - name: param
         type: String
         type_specs: (150)
@@ -329,6 +332,8 @@ namespaces:
       - keys:
         - name: param
         - name: category
+    list_api: list settings
+    list_api_description: list settings
     find_api: find setting param
     find_api_description: find setting param
     update_api: update setting param

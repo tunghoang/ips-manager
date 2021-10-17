@@ -13,6 +13,7 @@ __db = DbInstance.getInstance()
 
 class Settings(__db.Base):
   __tablename__ = "settings"
+  idSetting = Column(Integer, primary_key = True)
   param = Column(String(150))
   value = Column(String(512))
   category = Column(String(150))
@@ -23,6 +24,8 @@ class Settings(__db.Base):
     __table_args__ = tuple(constraints)
  
   def __init__(self, dictModel):
+    if ("idSetting" in dictModel) and (dictModel["idSetting"] != None):
+      self.idSetting = dictModel["idSetting"]
     if ("param" in dictModel) and (dictModel["param"] != None):
       self.param = dictModel["param"]
     if ("value" in dictModel) and (dictModel["value"] != None):
@@ -31,14 +34,16 @@ class Settings(__db.Base):
       self.category = dictModel["category"]
 
   def __repr__(self):
-    return '<Settings param={} value={} category={} >'.format(self.param, self.value, self.category, )
+    return '<Settings idSetting={} param={} value={} category={} >'.format(self.idSetting, self.param, self.value, self.category, )
 
   def json(self):
     return {
-      "param":self.param,"value":self.value,"category":self.category,
+      "idSetting":self.idSetting,"param":self.param,"value":self.value,"category":self.category,
     }
 
   def update(self, dictModel):
+    if ("idSetting" in dictModel) and (dictModel["idSetting"] != None):
+      self.idSetting = dictModel["idSetting"]
     if ("param" in dictModel) and (dictModel["param"] != None):
       self.param = dictModel["param"]
     if ("value" in dictModel) and (dictModel["value"] != None):
